@@ -5,7 +5,10 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/anton.woff2') format('woff2');
+  /* Resolved relative to this CSS file so Vite fingerprints it and emits a
+     base-correct URL (…/monsterdex/assets/anton-[hash].woff2). An absolute
+     '/fonts/…' path 404s under the GitHub Pages subpath. */
+  src: url('./fonts/anton.woff2') format('woff2');
 }
 
 :root {
