@@ -141,9 +141,12 @@
 }
 
 /* ── A–Z / Z–A flat grid ────────────────────────────────────────────────── */
+/* Responsive: fit as many ~110px cards as the width allows, stretching them to
+   fill the row (no dead space). Lands on 3-up at iPhone-16 width (393px), drops
+   to 2-up on narrower phones automatically — no horizontal clipping. */
 .az-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: var(--space-2);
   padding-top: var(--space-3);
 }
@@ -166,6 +169,8 @@
 }
 .az-grid .card {
   width: auto; /* fill the grid cell in flat view */
+  min-width: 0; /* allow the card to shrink below its content's natural width
+                   (long names wrap) so the grid track never overflows + clips */
 }
 .card-top {
   display: flex;

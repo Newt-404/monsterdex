@@ -9,15 +9,19 @@ import { Stars } from './stars';
 import { openFlavor, stateOf, toggleWishlist } from '../store/state';
 import { categoryLabel, isTried, type Flavor } from '../types';
 
-export function FlavorCard({ flavor }: { flavor: Flavor }) {
+export function FlavorCard({ flavor, compact = false }: { flavor: Flavor; compact?: boolean }) {
   const st = stateOf(flavor.slug);
   const tried = isTried(st);
+  // The flat grid (A–Z / Z–A / By rating) packs cards tighter than the swipe row,
+  // so it shrinks the fixed-size can + stars to fit more columns (PRD §5.1 grid).
+  const canSize = compact ? 32 : 50;
+  const starSize = compact ? 8 : 13;
 
   return (
-    <article class="card" onClick={() => openFlavor(flavor.slug)}>
+    <article class={`card${compact ? ' card-compact' : ''}`} onClick={() => openFlavor(flavor.slug)}>
       <div class="card-top">
         <div class="card-thumb">
-          <FlavorImage flavor={flavor} width={50} />
+          <FlavorImage flavor={flavor} width={canSize} />
         </div>
         <div class="card-info">
           {/* nameMain only — the nameTop descriptor (e.g. "Zero Sugar") lives on
@@ -28,7 +32,7 @@ export function FlavorCard({ flavor }: { flavor: Flavor }) {
               <span class="card-dot" style={`background:${flavor.accentColor}`} />
               <span class="card-cat">{categoryLabel(flavor.line)}</span>
             </div>
-            <Stars rating={st.rating} size={13} />
+            <Stars rating={st.rating} size={starSize} />
           </div>
         </div>
       </div>

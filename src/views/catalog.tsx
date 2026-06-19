@@ -116,7 +116,7 @@ function FlatGrid() {
   return (
     <div class="az-grid">
       {catalogSorted.value.map((f) => (
-        <FlavorCard flavor={f} key={f.slug} />
+        <FlavorCard flavor={f} compact key={f.slug} />
       ))}
     </div>
   );
