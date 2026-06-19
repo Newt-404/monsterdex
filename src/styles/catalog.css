@@ -236,6 +236,9 @@
   align-items: center;
   justify-content: space-between;
   min-height: 18px;
+  /* Pin the tried/wishlist row to the bottom of the card so it lines up across
+     cards of unequal content height (the grid stretches them all to equal height). */
+  margin-top: auto;
 }
 .tried-pill {
   display: inline-flex;
