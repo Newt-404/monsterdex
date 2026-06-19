@@ -205,6 +205,16 @@
   /* wrap at spaces; only break a single word if it can't fit on its own line
      (avoids "ORIGINA L" style mid-word breaks on short names). */
   overflow-wrap: break-word;
+  /* Reserve exactly 2 lines for the name — both a max (clamp longer names, they
+     ellipsize; full name is on the detail screen) and a min (min-height) so a
+     1-line name occupies the same height as a 2-line one. A uniform name block
+     keeps the can/name block the same height on every card, so the tag + stars
+     (and the foot below) line up across cards instead of floating to varying levels. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.2em; /* 2 lines at line-height 1.1 */
 }
 .card-meta {
   margin-top: auto; /* push tag + stars to the bottom of the can's height */
