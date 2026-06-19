@@ -3,7 +3,9 @@
 // M4 / M5; the gear is shown here for header parity but is intentionally inert.
 // The Cans-Logged headline hides when counting is off (PRD §5.4), leaving 2 stats.
 
-import { dashboardStats, countingOn } from '../store/stats';
+import { dashboardStats } from '../store/stats';
+import { counterEnabled } from '../store/state';
+import { StarGlyph } from '../ui/stars';
 import '../styles/profile.css';
 
 function fmtAvg(avg: number | null, places: number): string {
@@ -12,12 +14,12 @@ function fmtAvg(avg: number | null, places: number): string {
 
 export function Profile() {
   const s = dashboardStats.value;
-  const counting = countingOn.value;
+  const counting = counterEnabled.value;
 
   return (
     <div class="profile">
       <header class="profile-head">
-        <h1 class="profile-title display">
+        <h1 class="screen-title profile-title display">
           Bassie's
           <br />
           MonsterDex
@@ -45,7 +47,7 @@ export function Profile() {
           <span class="stat-cap caption">Average Rating</span>
           <span class="stat-num display">
             {fmtAvg(s.avg, 1)}
-            {s.avg !== null ? <Star10 /> : null}
+            {s.avg !== null ? <StarGlyph size={22} class="stat-star" /> : null}
           </span>
           <span class="stat-sub">out of 5</span>
         </div>
@@ -53,14 +55,6 @@ export function Profile() {
 
       {/* Achievements grid lands in M4 (build plan: "header + headline stats, minus the grid"). */}
     </div>
-  );
-}
-
-function Star10() {
-  return (
-    <svg viewBox="0 0 100 100" width="22" height="22" aria-hidden="true" class="stat-star">
-      <path d="M50 6 L62 38 L96 40 L69 61 L79 94 L50 74 L21 94 L31 61 L4 40 L38 38 Z" fill="var(--accent)" />
-    </svg>
   );
 }
 

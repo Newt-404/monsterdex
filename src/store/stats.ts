@@ -9,7 +9,7 @@
 // snapshot builds on.
 
 import { computed } from '@preact/signals';
-import { allFlavors, counterEnabled, stateOf } from './state';
+import { allFlavors, stateOf } from './state';
 import { isTried, LINE_ORDER, OTHER_LINE, type Flavor } from '../types';
 
 /** A flavor paired with a sortable value (a 0–5 rating, or a can count). */
@@ -57,10 +57,11 @@ function avgOf(sum: number, n: number): number | null {
   return n === 0 ? null : sum / n;
 }
 
-/** Round a half-star rating up to its whole-star distribution bin (PRD §5.8:
- *  3.5★ → 4★). `Math.round` rounds .5 up for the positive values here. */
+/** Bin a 0.5–5 star rating into its whole-star distribution row, rounding half
+ *  UP (PRD §5.8: 3.5★ → 4★, 2.5★ → 3★). `floor(x + 0.5)` is half-up for every
+ *  value here, with none of `Math.round`'s round-half-to-even ambiguity. */
 function distBin(stars: number): number {
-  return Math.round(stars);
+  return Math.floor(stars + 0.5);
 }
 
 export const dashboardStats = computed<DashboardStats>(() => {
@@ -144,6 +145,3 @@ export const dashboardStats = computed<DashboardStats>(() => {
     mostDrunk,
   };
 });
-
-/** Counter-derived stats hide (never delete) when counting is off (PRD §5.4). */
-export const countingOn = computed<boolean>(() => counterEnabled.value);

@@ -13,10 +13,11 @@
   gap: var(--space-3);
   margin: var(--space-2) 0 var(--space-5);
 }
+/* The profile title is the two-line "BASSIE'S / MONSTERDEX" lockup — it overrides
+   the shared .screen-title spacing (the .profile-head owns the vertical margin). */
 .profile-title {
-  font-size: 44px; /* tokens §2 screen title 40–48 */
+  margin: 0;
   line-height: 0.98;
-  color: var(--text-1);
 }
 .profile-gear {
   flex: 0 0 auto;

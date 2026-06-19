@@ -52,6 +52,14 @@ input {
   text-transform: uppercase;
 }
 
+/* Screen title — the big UPPERCASE display heading at the top of every tab
+   (Catalog / Dashboard / Profile). tokens §2 screen title 40–48. */
+.screen-title {
+  font-size: 44px;
+  color: var(--text-1);
+  margin: var(--space-2) 0 var(--space-4);
+}
+
 /* Uppercase tracked caption (tokens §2 "Label / caption"). */
 .caption {
   font-size: 12px;

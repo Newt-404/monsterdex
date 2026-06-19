@@ -29,6 +29,16 @@ export function Stars({ rating, size = 20 }: StarsProps) {
   );
 }
 
+/** A single solid accent star glyph — used for stat labels and headline stats
+ *  (the distribution rows, the profile average). One definition, sized per call. */
+export function StarGlyph({ size = 12, class: className }: { size?: number; class?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true" class={className}>
+      <path d={STAR_PATH} fill="var(--accent)" />
+    </svg>
+  );
+}
+
 function Star({ fill, size, clipId }: { fill: 'full' | 'half' | 'empty'; size: number; clipId: string }) {
   return (
     <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">

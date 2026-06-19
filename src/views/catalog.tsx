@@ -35,7 +35,7 @@ export function Catalog() {
   const mode = sortMode.value;
   return (
     <div class="catalog">
-      <h1 class="catalog-title display">Catalog</h1>
+      <h1 class="screen-title display">Catalog</h1>
 
       {/* Pinned search — live filter over nameMain / nameTop / aliases (PRD §5.1) */}
       <div class="search-bar">

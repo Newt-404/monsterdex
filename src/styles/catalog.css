@@ -4,12 +4,6 @@
   padding: var(--space-4) var(--space-4) 0;
 }
 
-.catalog-title {
-  font-size: 44px; /* tokens §2 screen title 40–48 */
-  color: var(--text-1);
-  margin: var(--space-2) 0 var(--space-4);
-}
-
 /* ── Pinned search bar ──────────────────────────────────────────────────── */
 .search-bar {
   position: sticky;

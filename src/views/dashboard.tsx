@@ -5,9 +5,10 @@
 // when counting is off (PRD §5.4). Empty averages render as "—", never NaN/0.
 
 import type { ComponentChildren } from 'preact';
-import { dashboardStats, countingOn, type RankedFlavor } from '../store/stats';
+import { dashboardStats, type RankedFlavor } from '../store/stats';
+import { counterEnabled } from '../store/state';
 import { FlavorImage } from '../can/flavor-image';
-import { Stars } from '../ui/stars';
+import { Stars, StarGlyph } from '../ui/stars';
 import { Claw } from '../can/claw';
 import { OTHER_LINE } from '../types';
 import '../styles/dashboard.css';
@@ -23,11 +24,11 @@ function fmtAvg(avg: number | null, places: number): string {
 
 export function Dashboard() {
   const s = dashboardStats.value;
-  const counting = countingOn.value;
+  const counting = counterEnabled.value;
 
   return (
     <div class="dashboard">
-      <h1 class="catalog-title display">Dashboard</h1>
+      <h1 class="screen-title display">Dashboard</h1>
 
       {/* ── Progress ──────────────────────────────────────────────────────── */}
       <section class="panel dash-progress">
@@ -60,7 +61,7 @@ export function Dashboard() {
               <div class="dist-row" key={d.star}>
                 <span class="dist-star">
                   {d.star}
-                  <Star10 />
+                  <StarGlyph size={11} />
                 </span>
                 <div class="bar dist-bar">
                   <div class="bar-fill" style={`width:${d.pct}%`} />
@@ -137,7 +138,7 @@ export function Dashboard() {
           </section>
 
           <section class="panel dash-drunk">
-            <span class="dash-label">Most Drunk (by tries)</span>
+            <span class="dash-label">Most Drunk</span>
             {s.mostDrunk.length === 0 ? (
               <p class="dash-empty">Log a can to see your most-drunk flavors.</p>
             ) : (
@@ -167,15 +168,6 @@ function RankRow({ rank, r, children }: { rank: number; r: RankedFlavor; childre
       <span class="rank-name display">{r.flavor.nameMain}</span>
       {children}
     </li>
-  );
-}
-
-/** Tiny filled accent star for the distribution row labels (5 ★ … 1 ★). */
-function Star10() {
-  return (
-    <svg viewBox="0 0 100 100" width="11" height="11" aria-hidden="true">
-      <path d="M50 6 L62 38 L96 40 L69 61 L79 94 L50 74 L21 94 L31 61 L4 40 L38 38 Z" fill="var(--accent)" />
-    </svg>
   );
 }
 
