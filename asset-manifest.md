@@ -122,7 +122,8 @@ only** (every number/label in them is stale; see PRD §0a). Files live in
 ## 10. Suggested layout (builder may adjust)
 ```
 /assets/icons     app + pwa icons, favicon
-/assets/fonts     anton.woff2
+src/styles/fonts  anton.woff2 (in src, not public — Vite fingerprints it so the
+                  @font-face URL is base-correct under the /monsterdex/ subpath)
 /assets/renders   optional hero-flavor PNGs
 /src/can          parametric can component
 /src/badges       glyph svgs + medal

@@ -51,7 +51,6 @@ monsterdex/
 ├─ vite.config.ts            # base, vite-plugin-pwa config
 ├─ public/
 │  ├─ data/catalog.json      # 88 built-ins (precached)
-│  ├─ fonts/anton.woff2
 │  └─ icons/                 # pwa icons, favicon (asset-manifest §1)
 ├─ src/
 │  ├─ main.tsx
@@ -66,7 +65,9 @@ monsterdex/
 │  │  └─ engine.ts           # evaluate + unlock-log diff + celebration queue
 │  ├─ can/                   # parametric SVG can (PRD §8) + image resolver
 │  ├─ views/                 # Catalog, FlavorDetail, Dashboard, Profile, Settings
-│  └─ ui/                    # stars, chips, progress bar, badge tile, popups
+│  ├─ ui/                    # stars, chips, progress bar, badge tile, popups
+│  └─ styles/fonts/anton.woff2  # bundled display font — in src (not public) so
+│                            # Vite fingerprints it + emits a base-correct URL
 ```
 
 ---
@@ -197,8 +198,10 @@ it — they simply have no assets to serve until renders are dropped into
   Silent update: a new build's SW activates (`skipWaiting` + `clientsClaim`) and
   takes effect on next launch — no "reload?" prompt for a single user.
 - **Precache** (works offline from first launch, PRD §7): app shell (JS/CSS/HTML),
-  `catalog.json`, `anton.woff2`, badge glyph SVGs, PWA icons. Workbox revision
-  hashes handle cache versioning + cleanup per build.
+  `catalog.json`, the bundled Anton font, badge glyph SVGs, PWA icons. Workbox
+  revision hashes handle cache versioning + cleanup per build. (Anton lives in
+  `src/styles/fonts` and is imported via CSS, so it's a fingerprinted build asset
+  — Workbox picks it up from the build manifest automatically, no manual entry.)
 - **Runtime caching:** the dormant CacheFirst route for future renders (§5).
 - **iOS caveats (reference, PRD §3 / §11):** the installed instance and a Safari
   tab can hold *separate* IndexedDB stores → the Settings guide tells Bassie to

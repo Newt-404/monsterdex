@@ -29,7 +29,7 @@ Deploy: push `dist/` to GitHub Pages (Action on push to main, or `gh-pages`).
 
 ## Layout
 ```
-public/data/catalog.json · public/fonts/anton.woff2 · public/icons/
+public/data/catalog.json · public/icons/ · src/styles/fonts/anton.woff2
 src/main.tsx · src/app.tsx
 src/store/{db,state,backup}.ts        # idb, signals + write-through, backup
 src/badges/{defs,snapshot,engine}.ts  # §5.11 as data, derive, evaluate
