@@ -1,0 +1,275 @@
+/* Dashboard tab (PRD §5.8, mockup-dashboard.png). Values from design-tokens.md. */
+
+.dashboard {
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+/* ── Shared stat panel (distinct from the catalog's fixed-width .card) ────── */
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: var(--space-4);
+  /* Critical for the two-up grid: grid/flex items default to min-width:auto and
+     refuse to shrink below their content's natural width, which pushes the track
+     past the container and gets clipped by the shell's overflow-x:hidden. This
+     lets the 1fr tracks actually shrink so nothing spills off-screen. */
+  min-width: 0;
+}
+
+/* Green uppercase section label ("YOUR PROGRESS", "AVERAGE RATING") — tokens §2. */
+.dash-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Big white display number (3.88, 147) — tokens §2 big-stat. */
+.dash-bignum {
+  font-size: 60px;
+  line-height: 1;
+  color: var(--text-1);
+}
+.dash-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.dash-empty {
+  color: var(--text-2);
+  font-size: 13px;
+  margin-top: var(--space-2);
+}
+
+/* Two-up panel grid (avg|dist, top|byline, cans|drunk). Two-up by default, down
+   to a dense-but-readable layout on a 390px iPhone; on genuinely tiny screens
+   (≤360px, e.g. iPhone SE) the pair stacks to one full-width column so nothing
+   gets cramped. The shrink itself is enabled by `min-width:0` on `.panel`. */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 360px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Progress card ──────────────────────────────────────────────────────── */
+.dash-progress {
+  margin-top: var(--space-4);
+}
+.dash-progress-line {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: 18px;
+  color: var(--text-2);
+}
+.dash-progress-line b {
+  color: var(--text-1);
+  font-weight: 700;
+}
+.dash-pct {
+  color: var(--accent);
+  font-weight: 700;
+}
+.dash-dot {
+  color: var(--text-3);
+}
+
+/* ── Progress / distribution bar (tokens §5: ~10px, track + accent fill) ─── */
+.bar {
+  height: 10px;
+  border-radius: var(--r-chip);
+  background: var(--track);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: var(--r-chip);
+  background: var(--accent);
+  box-shadow: var(--glow-active);
+}
+
+/* ── Average rating card ────────────────────────────────────────────────── */
+.dash-avg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.dash-avg .dash-bignum {
+  margin: var(--space-1) 0;
+}
+
+/* ── Rating distribution card ───────────────────────────────────────────── */
+.dist-rows {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.dist-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.dist-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: 24px;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.dist-bar {
+  flex: 1;
+  min-width: 0;
+}
+.dist-pct {
+  width: 36px;
+  flex: 0 0 auto;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* ── Ranked lists (top flavors, most drunk) ─────────────────────────────── */
+.rank-list {
+  list-style: none;
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.rank-num {
+  width: 14px;
+  flex: 0 0 auto;
+  font-size: 15px;
+  color: var(--text-2);
+}
+.rank-thumb {
+  flex: 0 0 auto;
+  display: flex;
+}
+.rank-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rank-val {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.dash-top .rank-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-viewall {
+  margin-top: var(--space-4);
+  color: var(--accent);
+  cursor: default;
+}
+
+/* ── By-line table ──────────────────────────────────────────────────────── */
+.byline-head {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.byline-head > span:first-child {
+  flex: 1;
+}
+.byline-rows {
+  display: flex;
+  flex-direction: column;
+}
+.byline-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.byline-row:last-child {
+  border-bottom: none;
+}
+.byline-name {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.byline-claw {
+  flex: 0 0 auto;
+}
+.byline-line {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.byline-tried {
+  width: 38px;
+  flex: 0 0 auto;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.byline-avg {
+  width: 50px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.byline-avg b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* ── Cans logged card ───────────────────────────────────────────────────── */
+.dash-cans-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: var(--space-1) 0;
+}
+.dash-can-outline {
+  flex: 0 0 auto;
+  filter: drop-shadow(var(--glow-active));
+}

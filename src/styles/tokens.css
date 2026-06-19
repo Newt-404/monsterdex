@@ -1,0 +1,58 @@
+/* Design tokens — verbatim from design-tokens.md. Do not eyeball; edit there. */
+
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton.woff2') format('woff2');
+}
+
+:root {
+  /* §1 Color — Base surfaces */
+  --bg:        #0B0B0C; /* PINNED — matte near-black app background */
+  --surface-1: #161617; /* cards (stat blocks, progress, badge tiles) */
+  --surface-2: #1E1F21; /* nested controls (review box, +1 bar, wishlist row) */
+  --surface-3: #232427; /* can thumbnail bg, unselected chip fill */
+  --border:    #2A2B2E; /* hairline borders / dividers */
+
+  /* Accent (UI green — distinct from per-flavor can color) */
+  --accent:       #7CFC00; /* PINNED — stars, active states, progress, unlocks */
+  --accent-press: #6FE000; /* pressed/active darker step */
+  --on-accent:    #0B0B0C; /* PINNED — text/icons sitting ON a green fill */
+
+  /* Text */
+  --text-1: #F4F5F4; /* primary / display headings, big numbers */
+  --text-2: #9A9CA0; /* secondary labels ("YOUR PROGRESS", body) */
+  --text-3: #6A6C70; /* tertiary ("/90+", locked requirement text) */
+
+  /* States */
+  --star-empty: #3C3D40; /* empty/outline star */
+  --locked:     #54565A; /* locked badge icon + lock glyph */
+  --danger:     #FF453A; /* destructive (Delete custom flavor) */
+  --check:      var(--accent);
+  --track:      var(--border);
+
+  /* §2 Typography */
+  --font-display: 'Anton', 'Oswald', sans-serif;
+  --font-body: -apple-system, 'SF Pro Text', system-ui, 'Inter', sans-serif;
+
+  /* §3 Spacing & radii */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  --r-tile:   16px; /* badge tiles */
+  --r-card:   18px; /* stat / progress cards */
+  --r-input:  14px; /* review box, +1 bar, wishlist row */
+  --r-button: 14px; /* primary buttons */
+  --r-chip:   999px; /* pill: filter chips, segmented toggle */
+
+  /* §4 Elevation & glow */
+  --shadow-can:  0 6px 18px rgba(0, 0, 0, 0.5);
+  --glow-active: 0 0 16px rgba(124, 252, 0, 0.35);
+  --glow-strong: 0 0 28px rgba(124, 252, 0, 0.55);
+}

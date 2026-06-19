@@ -1,0 +1,71 @@
+/* Global base — dark theme only (PRD §9 / tokens §7). */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* nothing scrolls the page sideways — swipe rows scroll internally */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Disable tap-highlight + overscroll glow for a native feel. */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+}
+
+/* Display face — heavy condensed, used for headings + big numbers. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400; /* Anton ships a single weight; design weight comes from the face */
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Uppercase tracked caption (tokens §2 "Label / caption"). */
+.caption {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* Hide scrollbars on the horizontal swipe rows (iOS hides them natively). */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,48 @@
+/* Parametric can styling (from the CAN_SVG template). Each <Can> sets --can-color
+   and --ink inline; these classes resolve against them. */
+
+.can-svg {
+  display: block;
+}
+
+/* Image-resolver container (architecture §5): fixed aspect = the can's, so the
+   SVG floor and any user-photo upgrade swap with zero layout shift. */
+.flavor-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.flavor-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.can-fill {
+  fill: var(--can-color);
+}
+
+.can-claw {
+  fill: var(--ink);
+}
+
+.can-label {
+  fill: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: 0.5px;
+}
+
+.can-label-sm {
+  fill: var(--ink);
+  opacity: 0.82;
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: 2.4px;
+}

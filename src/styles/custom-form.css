@@ -1,0 +1,108 @@
+/* Custom-flavor add/edit sheet. Values from design-tokens.md. Modal over the app,
+   bottom-anchored on phones. */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  width: 100%;
+  max-width: 540px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  padding: var(--space-5) var(--space-4) calc(var(--space-5) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.sheet-title {
+  font-size: 26px;
+  color: var(--text-1);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.field-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  color: var(--text-1);
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: var(--space-3) var(--space-4);
+  outline: none;
+}
+.field-input::placeholder {
+  color: var(--text-3);
+}
+
+.field-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+.color-field {
+  flex: 1;
+}
+.color-input {
+  width: 100%;
+  height: 44px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  padding: 4px;
+}
+.check-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 44px;
+}
+.check-field input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.sheet-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.sheet-actions .ghost-btn {
+  flex: 1;
+  justify-content: center;
+}
+.primary-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-button);
+  font-size: 15px;
+  font-weight: 700;
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--glow-active);
+}
+.primary-btn:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+}

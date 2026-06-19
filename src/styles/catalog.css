@@ -1,0 +1,271 @@
+/* Catalog tab layout. Values from design-tokens.md. */
+
+.catalog {
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.catalog-title {
+  font-size: 44px; /* tokens §2 screen title 40–48 */
+  color: var(--text-1);
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+/* ── Pinned search bar ──────────────────────────────────────────────────── */
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  padding: 0 var(--space-4);
+  height: 48px;
+}
+.search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-1);
+  font-size: 16px;
+}
+.search-input::placeholder {
+  color: var(--text-3);
+}
+
+/* ── Segmented sort/group toggle ────────────────────────────────────────── */
+.segmented {
+  display: flex;
+  gap: var(--space-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  padding: var(--space-1);
+  margin: var(--space-4) 0 var(--space-3);
+}
+.seg-btn {
+  flex: 1 1 0;
+  min-width: 0; /* allow equal shrink so all three fit at iPhone width */
+  border-radius: var(--r-chip);
+  padding: var(--space-2) 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-align: center;
+}
+.seg-btn.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--glow-active);
+}
+
+/* ── Filter chips ───────────────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  justify-content: space-between; /* spread Tried / Not-tried / Wishlist across the width */
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  padding: var(--space-2) var(--space-3);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--glow-active);
+}
+
+/* ── Line sections ──────────────────────────────────────────────────────── */
+.line-section {
+  margin-top: var(--space-4);
+}
+.line-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) 0;
+}
+.line-name {
+  font-size: 26px;
+  color: var(--text-1);
+}
+.line-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-chip);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+.chevron {
+  margin-left: auto;
+  color: var(--text-2);
+  display: inline-flex;
+  transition: transform 0.18s ease;
+}
+.chevron.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* ── Horizontal swipe row of fixed-width cards (no stretch) ─────────────── */
+.swipe-row {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding: var(--space-2) 0 var(--space-3);
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── A–Z / Z–A flat grid ────────────────────────────────────────────────── */
+.az-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+}
+
+/* ── Flavor card ────────────────────────────────────────────────────────── */
+/* Fixed-width, dense swipe-row card (matches the mockup's ~3–4 visible cards).
+   Column layout: a top row (can | info) over a full-width foot (tried | heart). */
+.card {
+  flex: 0 0 auto; /* fixed width in swipe rows — no stretch */
+  width: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 10px;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+.az-grid .card {
+  width: auto; /* fill the grid cell in flat view */
+}
+.card-top {
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+  /* stretch so .card-info fills the can's height — lets the tag/stars drop to
+     the bottom via space-between. */
+  align-items: stretch;
+}
+/* Free-standing can on the card surface (no thumbnail chip), top-aligned so it
+   reads as a prominent can — matches the mockup. */
+.card-thumb {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-top: 6px; /* breathing room above the name */
+}
+.card-namemain {
+  font-size: 12px;
+  line-height: 1.1;
+  color: var(--text-1);
+  /* Anton is single-weight; loosen tracking so the name reads a touch lighter
+     and less cramped (overrides .display's tight -0.01em). */
+  letter-spacing: 0.4px;
+  /* wrap at spaces; only break a single word if it can't fit on its own line
+     (avoids "ORIGINA L" style mid-word breaks on short names). */
+  overflow-wrap: break-word;
+}
+.card-meta {
+  margin-top: auto; /* push tag + stars to the bottom of the can's height */
+  padding-bottom: 6px; /* breathing room below the stars */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* space between the tag and the stars */
+}
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.card-cat {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 18px;
+}
+.tried-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+/* Untried: muted status label (untried cans otherwise render the same as tried). */
+.untried-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.heart {
+  display: inline-flex;
+  margin-left: auto;
+  padding: 0;
+}
+
+/* ── Add custom flavor (PRD §5.5 entry point) ───────────────────────────── */
+.add-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  margin: var(--space-5) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-button);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+}

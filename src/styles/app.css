@@ -1,0 +1,72 @@
+/* App shell: fixed-height column with a scrolling content area above a pinned
+   tab bar. Safe-area insets for the iPhone home indicator + notch. */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.app-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* swipe rows scroll internally; nothing else may bleed wide */
+  -webkit-overflow-scrolling: touch;
+  padding-top: env(safe-area-inset-top);
+  /* leave room for the tab bar */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+/* ── Tab bar (tokens §5) ────────────────────────────────────────────────── */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  max-width: 540px;
+  margin: 0 auto;
+  background: rgba(11, 11, 12, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--space-2) 0 var(--space-3);
+}
+.tab-indicator {
+  position: absolute;
+  top: 0;
+  width: 36px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: transparent;
+}
+.tab.active .tab-indicator {
+  background: var(--accent);
+  box-shadow: var(--glow-active);
+}
+.tab-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── Stub tab pages (Dashboard / Profile — content lands in M3/M4) ──────── */
+.tab-page {
+  padding: var(--space-4);
+}
+.placeholder {
+  color: var(--text-2);
+  font-size: 15px;
+  margin-top: var(--space-3);
+}
