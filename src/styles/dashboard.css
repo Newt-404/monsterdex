@@ -199,6 +199,7 @@
 .byline-head {
   display: flex;
   align-items: center;
+  gap: var(--space-2); /* match the rows' column gap so headers align over them */
   margin-top: var(--space-3);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--border);
@@ -220,6 +221,7 @@
   white-space: nowrap;
   text-align: right;
   font-size: inherit;
+  color: inherit; /* all three headers share the byline-head grey */
 }
 .byline-rows {
   display: flex;
@@ -259,15 +261,15 @@
   text-align: right;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-2);
+  color: var(--text-1); /* match the white row values (name + avg number) */
 }
 .byline-avg {
-  width: 50px;
+  width: 54px; /* fit the 9px stars (5 × 9 + gaps ≈ 53) without spilling left */
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 3px;
+  gap: 1px; /* tight number→stars spacing so the cell is less tall */
 }
 .byline-avg b {
   font-size: 15px;
