@@ -108,7 +108,7 @@ export function Dashboard() {
                   {l.isCustomBucket ? (
                     <FlaskIcon />
                   ) : (
-                    <Claw fill="var(--accent)" size={24} class="byline-claw" />
+                    <Claw fill="var(--accent)" size={18} class="byline-claw" />
                   )}
                   <span class="byline-line display">{l.line === OTHER_LINE ? 'Custom' : l.line}</span>
                 </span>
@@ -119,7 +119,7 @@ export function Dashboard() {
                 </span>
                 <span class="byline-avg">
                   <b>{fmtAvg(l.avg, 2)}</b>
-                  <Stars rating={l.avg === null ? null : halfStars(l.avg)} size={9} />
+                  <Stars rating={l.avg === null ? null : halfStars(l.avg)} size={7} />
                 </span>
               </div>
             ))}
@@ -176,7 +176,7 @@ function RankRow({ rank, r, children }: { rank: number; r: RankedFlavor; childre
 /** Line-less "Other" customs bucket marker (PRD §5.8) — a flask, per the mockup. */
 function FlaskIcon() {
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="byline-claw">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" class="byline-claw">
       <path
         d="M9 3h6M10 3v6.2L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.2V3"
         fill="none"

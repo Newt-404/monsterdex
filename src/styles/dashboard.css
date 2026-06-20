@@ -196,10 +196,16 @@
 }
 
 /* ── By-line table ──────────────────────────────────────────────────────── */
+/* Trim this panel's side padding (not the others) to give the table more width
+   for line names — doesn't change the card size, only the inner padding. */
+.dash-byline {
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
 .byline-head {
   display: flex;
   align-items: center;
-  gap: var(--space-2); /* match the rows' column gap so headers align over them */
+  gap: 6px; /* match the rows' column gap so headers align over them */
   margin-top: var(--space-3);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--border);
@@ -235,7 +241,7 @@
 .byline-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
@@ -283,7 +289,7 @@
   text-align: left;
 }
 .byline-avg {
-  width: 54px; /* fit the 9px stars (5 × 9 + gaps ≈ 53) without spilling left */
+  width: 44px; /* fit the 7px stars (5 × 7 + gaps ≈ 43) without spilling left */
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
