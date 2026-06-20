@@ -268,12 +268,16 @@
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 500;
+  line-height: 1.1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-1);
-  white-space: nowrap;
+  /* Wrap long names to a second line (full name shown) rather than truncating —
+     those rows get a touch taller. Clamp at 2 lines just in case. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .byline-tried {
   width: 42px;
@@ -298,15 +302,16 @@
   text-align: left;
 }
 .byline-avg {
-  width: 34px; /* just the avg number now (stars removed) — frees width for names */
+  width: 30px; /* just the avg number now (stars removed) — frees width for names */
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 .byline-avg b {
-  font-size: 15px;
-  font-weight: 500; /* lighter than the old bold 700 */
+  /* Same size + weight as the other row values (the tried numbers). */
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1;
   color: var(--text-1);
 }
