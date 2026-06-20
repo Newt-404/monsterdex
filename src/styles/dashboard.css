@@ -211,13 +211,15 @@
 .byline-head > span:first-child {
   flex: 1;
 }
-/* Header cells are single-line labels — don't inherit the rows' centring or the
-   avg cell's column stacking (which made "Avg Rating" wrap to two lines). */
+/* Header cells are single-line labels — don't inherit the rows' centring, the
+   avg cell's column stacking (which made "Avg Rating" wrap to two lines), or the
+   tried cell's 12px value size (so all three headers match at the byline-head size). */
 .byline-head .byline-tried,
 .byline-head .byline-avg {
   display: block;
   white-space: nowrap;
   text-align: right;
+  font-size: inherit;
 }
 .byline-rows {
   display: flex;
@@ -260,7 +262,7 @@
   color: var(--text-2);
 }
 .byline-avg {
-  width: 56px;
+  width: 50px;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
