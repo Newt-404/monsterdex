@@ -154,8 +154,13 @@ function patch(slug: string, partial: Partial<FlavorState>): FlavorState {
 /** Set a half-star rating (1–10) or clear it (null). Rating a wishlisted flavor
  *  auto-clears its wishlist flag (PRD §5.3); clearing the rating does not. */
 export function setRating(slug: string, rating: number | null): void {
+  const current = stateOf(slug);
   const partial: Partial<FlavorState> = { rating };
-  if (rating !== null && stateOf(slug).wishlist) partial.wishlist = false;
+  if (rating !== null && current.wishlist) partial.wishlist = false;
+  // You can't rate what you haven't had — a first rating implies at least one can.
+  // Only seed the count from 0; never auto-bump an existing tally, and clearing a
+  // rating leaves the count alone (clearing a rating ≠ "never had it").
+  if (rating !== null && current.count === 0) partial.count = 1;
   patch(slug, partial);
 }
 
