@@ -119,7 +119,6 @@ export function Dashboard() {
                 </span>
                 <span class="byline-avg">
                   <b>{fmtAvg(l.avg, 2)}</b>
-                  <Stars rating={l.avg === null ? null : halfStars(l.avg)} size={7} />
                 </span>
               </div>
             ))}
