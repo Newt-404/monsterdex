@@ -5,7 +5,7 @@
 // when counting is off (PRD §5.4). Empty averages render as "—", never NaN/0.
 
 import type { ComponentChildren } from 'preact';
-import { dashboardStats, type RankedFlavor } from '../store/stats';
+import { dashboardStats, fmtAvg, type RankedFlavor } from '../store/stats';
 import { counterEnabled } from '../store/state';
 import { FlavorImage } from '../can/flavor-image';
 import { Stars, StarGlyph } from '../ui/stars';
@@ -16,10 +16,6 @@ import '../styles/dashboard.css';
 /** Stars take a half-star integer; map a 0–5 average onto the nearest half-star. */
 function halfStars(avg: number): number {
   return Math.round(avg * 2);
-}
-/** "—" for an unrated scope, else the average to `places` decimals. */
-function fmtAvg(avg: number | null, places: number): string {
-  return avg === null ? '—' : avg.toFixed(places);
 }
 
 export function Dashboard() {

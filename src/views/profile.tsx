@@ -3,14 +3,10 @@
 // M4 / M5; the gear is shown here for header parity but is intentionally inert.
 // The Cans-Logged headline hides when counting is off (PRD §5.4), leaving 2 stats.
 
-import { dashboardStats } from '../store/stats';
+import { dashboardStats, fmtAvg } from '../store/stats';
 import { counterEnabled } from '../store/state';
 import { StarGlyph } from '../ui/stars';
 import '../styles/profile.css';
-
-function fmtAvg(avg: number | null, places: number): string {
-  return avg === null ? '—' : avg.toFixed(places);
-}
 
 export function Profile() {
   const s = dashboardStats.value;

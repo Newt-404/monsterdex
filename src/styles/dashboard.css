@@ -305,9 +305,7 @@
 .byline-avg {
   width: 30px; /* just the avg number now (stars removed) — frees width for names */
   flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  text-align: right;
 }
 .byline-avg b {
   /* Same size + weight as the other row values (the tried numbers). */

@@ -76,3 +76,5 @@ src/views/  src/ui/
 - `design-tokens.md` — color/type/spacing (still `EST`-laden; finalize in M6).
 - `asset-manifest.md` — every asset + status.
 - `catalog.json` — 88 flavors, 13 lines (hexes need M6 tuning).
+- `deferred-decisions.md` — intentionally postponed/settled UI choices; read
+  before flagging "missing"/"off" UI as a bug.

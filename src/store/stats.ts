@@ -57,6 +57,12 @@ function avgOf(sum: number, n: number): number | null {
   return n === 0 ? null : sum / n;
 }
 
+/** Format a 0–5 average for display: fixed decimals, or "—" when nothing is rated
+ *  (PRD §5.8 — averages over zero rated inputs never render as 0 or NaN). */
+export function fmtAvg(avg: number | null, places: number): string {
+  return avg === null ? '—' : avg.toFixed(places);
+}
+
 /** Bin a 0.5–5 star rating into its whole-star distribution row, rounding half
  *  UP (PRD §5.8: 3.5★ → 4★, 2.5★ → 3★). `floor(x + 0.5)` is half-up for every
  *  value here, with none of `Math.round`'s round-half-to-even ambiguity. */
