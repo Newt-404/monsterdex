@@ -113,7 +113,9 @@ export function Dashboard() {
                   <span class="byline-line display">{l.line === OTHER_LINE ? 'Custom' : l.line}</span>
                 </span>
                 <span class="byline-tried">
-                  {l.tried}/{l.total}
+                  <span class="bt-num">{l.tried}</span>
+                  <span class="bt-sep">/</span>
+                  <span class="bt-den">{l.total}</span>
                 </span>
                 <span class="byline-avg">
                   <b>{fmtAvg(l.avg, 2)}</b>

@@ -219,9 +219,14 @@
 .byline-head .byline-avg {
   display: block;
   white-space: nowrap;
-  text-align: right;
   font-size: inherit;
   color: inherit; /* all three headers share the byline-head grey */
+}
+.byline-head .byline-tried {
+  text-align: center; /* centred over the slash-aligned values below */
+}
+.byline-head .byline-avg {
+  text-align: right;
 }
 .byline-rows {
   display: flex;
@@ -258,10 +263,24 @@
 .byline-tried {
   width: 42px;
   flex: 0 0 auto;
-  text-align: right;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-1); /* match the white row values (name + avg number) */
+  /* Pin the slash to the column centre: equal flex halves grow outward from it,
+     so every row's "/" lines up vertically regardless of digit count. */
+  display: flex;
+  align-items: baseline;
+}
+.bt-num {
+  flex: 1;
+  text-align: right;
+}
+.bt-sep {
+  padding: 0 1px;
+}
+.bt-den {
+  flex: 1;
+  text-align: left;
 }
 .byline-avg {
   width: 54px; /* fit the 9px stars (5 × 9 + gaps ≈ 53) without spilling left */
