@@ -204,12 +204,20 @@
   border-bottom: 1px solid var(--border);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-3);
 }
 .byline-head > span:first-child {
   flex: 1;
+}
+/* Header cells are single-line labels — don't inherit the rows' centring or the
+   avg cell's column stacking (which made "Avg Rating" wrap to two lines). */
+.byline-head .byline-tried,
+.byline-head .byline-avg {
+  display: block;
+  white-space: nowrap;
+  text-align: right;
 }
 .byline-rows {
   display: flex;
@@ -218,7 +226,8 @@
 .byline-row {
   display: flex;
   align-items: center;
-  padding: var(--space-2) 0;
+  gap: var(--space-2);
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
 .byline-row:last-child {
@@ -229,13 +238,13 @@
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
 .byline-claw {
   flex: 0 0 auto;
 }
 .byline-line {
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.02em;
   color: var(--text-1);
   white-space: nowrap;
@@ -243,24 +252,25 @@
   text-overflow: ellipsis;
 }
 .byline-tried {
-  width: 38px;
+  width: 42px;
   flex: 0 0 auto;
-  text-align: center;
+  text-align: right;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-2);
 }
 .byline-avg {
-  width: 50px;
+  width: 56px;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 3px;
 }
 .byline-avg b {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1;
   color: var(--text-1);
 }
 
