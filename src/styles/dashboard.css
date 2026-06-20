@@ -233,6 +233,10 @@
 }
 .byline-head .byline-avg {
   text-align: right;
+  /* Keep the header cell at its column width instead of expanding to fit the full
+     "AVG RATING" label (which pushed it out past the card edge). It now right-aligns
+     to the card edge and the label extends left into the gap — TRIED stays put. */
+  min-width: 0;
 }
 .byline-rows {
   display: flex;
@@ -259,7 +263,7 @@
   flex: 0 0 auto;
 }
 .byline-line {
-  font-size: 14px;
+  font-size: 12px;
   letter-spacing: 0.02em;
   color: var(--text-1);
   white-space: nowrap;
@@ -269,7 +273,7 @@
 .byline-tried {
   width: 42px;
   flex: 0 0 auto;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-1); /* match the white row values (name + avg number) */
   /* Pin the slash to the column centre: equal flex halves grow outward from it,
