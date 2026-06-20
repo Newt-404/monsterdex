@@ -1,0 +1,84 @@
+/* First-launch birthday overlay (mockup-birthday.png). Values from design-tokens.md;
+   the hero headline scales with viewport width (clamped) so it fills the screen on an
+   iPhone the way the mockup does without overflowing the narrowest device. */
+
+.birthday-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110; /* above the badge-unlock popup (100) and tab bar — first launch owns the screen */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--bg);
+  padding: calc(env(safe-area-inset-top) + var(--space-6)) var(--space-6)
+    calc(env(safe-area-inset-bottom) + var(--space-6));
+  animation: birthday-fade 0.45s ease both;
+}
+
+.birthday-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 460px;
+}
+
+.birthday-claw {
+  filter: drop-shadow(0 0 16px rgba(var(--accent-rgb), 0.45));
+}
+
+.birthday-head {
+  margin: 0;
+  color: var(--accent);
+  font-size: var(--fs-display);
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+  text-shadow: 0 0 38px rgba(var(--accent-rgb), 0.32);
+}
+
+.birthday-body {
+  margin: 0;
+  max-width: 21em;
+  font-size: var(--fs-body); /* tokens §2 body/review */
+  line-height: 1.5;
+  color: var(--text-1);
+}
+
+.birthday-cta {
+  margin-top: var(--space-2);
+  width: 100%;
+  max-width: 360px;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--r-button);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--fs-cta);
+  letter-spacing: 0.02em;
+  box-shadow: var(--glow-strong); /* hero button glows strong, per the mockup */
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+.birthday-cta:active {
+  background: var(--accent-press);
+  transform: translateY(1px);
+}
+
+@keyframes birthday-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .birthday-overlay {
+    animation: none;
+  }
+  .birthday-cta {
+    transition: none;
+  }
+}
