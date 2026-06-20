@@ -1,5 +1,5 @@
 // Parametric SVG can (PRD §8 / CAN_SVG template). Geometry is shared once in
-// <CanDefs>; each instance is just the recolor vars (--can-color / --ink), <use>s
+// <CanDefs>; each instance is just the recolor vars (--can-color / --ink / --claw), <use>s
 // of the shared parts, and the per-flavor text. Drawn at runtime, no per-flavor
 // assets.
 
@@ -8,7 +8,7 @@ import type { Flavor } from '../types';
 import './can.css';
 
 interface CanProps {
-  flavor: Pick<Flavor, 'accentColor' | 'nameTop' | 'nameMain' | 'line' | 'alcoholic'>;
+  flavor: Pick<Flavor, 'accentColor' | 'clawColor' | 'nameTop' | 'nameMain' | 'line' | 'alcoholic'>;
   /** Rendered pixel width; the SVG scales to it (viewBox is fixed at 190×369). */
   width?: number;
 }
@@ -17,7 +17,7 @@ const VB_W = 190;
 const VB_H = 369;
 
 export function Can({ flavor, width = 120 }: CanProps) {
-  const { accentColor, nameTop, nameMain, line, alcoholic } = flavor;
+  const { accentColor, clawColor, nameTop, nameMain, line, alcoholic } = flavor;
   const mainLines = splitName(nameMain);
   const mainYs = mainLines.length === 2 ? [245, 268] : [256];
 
@@ -27,7 +27,7 @@ export function Can({ flavor, width = 120 }: CanProps) {
       viewBox={`0 0 ${VB_W} ${VB_H}`}
       width={width}
       height={(width * VB_H) / VB_W}
-      style={`--can-color:${accentColor};--ink:${ink(accentColor)}`}
+      style={`--can-color:${accentColor};--ink:${ink(accentColor)};--claw:${clawColor ?? ink(accentColor)}`}
       role="img"
       aria-label={`${nameTop ? nameTop + ' ' : ''}${nameMain} — ${line}`}
     >
@@ -81,17 +81,27 @@ function splitName(name: string): string[] {
   return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')].map((s) => s.toUpperCase());
 }
 
-// textLength fits text to the body width. Applied only when a line is long enough
-// to risk overflow; short lines keep their natural width (no stretching).
-// M6: refine to a true measured max-fit during the can visual pass.
-const MAIN_FIT = 120;
-const SMALL_FIT = 128;
+// Name fitting (PRD §8). `textLength` is applied ONLY to compress a name that would
+// overflow the body — short names keep their natural width and are never stretched (the
+// old binary length≥8 rule force-stretched medium names to a fixed width). We can't
+// measure SVG text without the DOM, so width is estimated from glyph count × advance:
+// Anton is heavily condensed, so uppercase advance ≈ 0.56em, plus the per-glyph letter-
+// spacing each label carries. The advance constant is confirmed on-device in Phase D
+// with the bundled font; erring slightly high just compresses borderline names a hair.
+const ANTON_ADVANCE = 0.56; // em, uppercase
+function fitWidth(text: string, fontSize: number, spacing: number, max: number): number | undefined {
+  const n = text.length;
+  const est = n * fontSize * ANTON_ADVANCE + Math.max(0, n - 1) * spacing;
+  return est > max ? max : undefined; // compress to fit; otherwise natural (no stretch)
+}
+// Body inner width is ~135u; usable widths back off from the curved edges. Letter-spacing
+// matches the .can-label / .can-label-sm rules in can.css (0.5 / 2.4).
 function fitMain(line: string): number | undefined {
-  return line.length >= 8 ? MAIN_FIT : undefined;
+  return fitWidth(line, 22, 0.5, 124);
 }
 function fitTop(top: string): number | undefined {
-  return top.length > 10 ? SMALL_FIT : undefined;
+  return fitWidth(top.toUpperCase(), 7.4, 2.4, 132);
 }
 function fitLine(line: string): number | undefined {
-  return line.length > 9 ? SMALL_FIT : undefined;
+  return fitWidth(line, 9, 2.4, 128);
 }

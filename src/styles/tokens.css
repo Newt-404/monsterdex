@@ -41,6 +41,28 @@
   --font-display: 'Anton', 'Oswald', sans-serif;
   --font-body: -apple-system, 'SF Pro Text', system-ui, 'Inter', sans-serif;
 
+  /* §2 Type scale — FINALIZED in M6 against the running app (was eyeballed `EST` in
+     design-tokens.md). These are the tuned, shipping pixel sizes; every view references
+     the token instead of a literal so the scale lives in one place. The small end
+     (--fs-micro / --fs-2xs) is the deliberately-dense By-Line + tile sub-text — kept
+     compact on purpose so the narrow columns don't clip (deferred-decisions.md). */
+  --fs-display:   clamp(52px, 18vw, 104px); /* birthday hero headline */
+  --fs-screen:    44px; /* screen titles (Catalog / Dashboard / Profile) — §2 40–48 */
+  --fs-stat:      60px; /* dashboard big number (3.88, 147) — §2 big-stat 56–72 */
+  --fs-stat-sm:   40px; /* profile headline stat numbers */
+  --fs-head:      34px; /* unlock-popup "ACHIEVEMENT UNLOCKED" */
+  --fs-cta:       28px; /* birthday hero button */
+  --fs-qmark:     26px; /* secret-tile "???" */
+  --fs-title:     22px; /* section + popup titles (ACHIEVEMENTS, badge name) */
+  --fs-lg:        18px; /* progress line — §2 card title 17–18 */
+  --fs-body:      16px; /* body / review — §2 15–16 */
+  --fs-md:        15px;
+  --fs-base:      14px;
+  --fs-sm:        13px; /* small tile/list text */
+  --fs-label:     12px; /* label / caption — §2 12–13 */
+  --fs-micro:     11px; /* dense tile sub-text + By-Line values */
+  --fs-2xs:       10px; /* By-Line column header */
+
   /* §3 Spacing & radii */
   --space-1: 4px;
   --space-2: 8px;

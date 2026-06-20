@@ -10,6 +10,9 @@ export interface Flavor {
   nameTop: string; // "" if none
   accentColor: string;
   accentConfidence: AccentConfidence;
+  /** Optional override for the claw/logo color; falls back to the auto-contrast
+   *  ink(accentColor) when absent (see Can / can.css). */
+  clawColor?: string;
   markets: string;
   aliases: string[];
   uncertain: boolean;

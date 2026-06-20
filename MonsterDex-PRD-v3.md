@@ -61,7 +61,10 @@ Flavor detail opens as a pushed screen from Catalog. Birthday welcome is a one-t
 ### 5.1 Catalog
 - All flavors, grouped by product line. **Line order:** Original, Ultra, Juice, Java, Reserve, Rehab, Killer Brew, Nitro, Hydro, Dragon Tea, Punch, The Beast Unleashed, Nasty Beast.
 - Pinned search bar — instant local filter over `nameMain`, `nameTop`, and `aliases` (so "Khaos" or "Zero Ultra" resolve). **An active search/filter overrides collapse:** a line with matches shows them even if its section was collapsed; the user's collapse state is restored when the search clears.
-- Sort/group toggle: **By line** / **A–Z** / **Z–A**.
+- Sort/group toggle: **By line** / **A–Z** / **Z–A** (segmented control). A **"By rating"**
+  sort is additionally offered as a toggle chip in the filter row (Tried / Not-tried /
+  Wishlist / By rating) — it re-orders by rating (highest first) and coexists with the
+  filters; toggling it off returns to the By-line grouping. (Added post-M6, Newt's call.)
 - **By-line layout:** every line section is **open by default**; each line is a **horizontal swipe row** of **fixed-width** cards. A short line (e.g. 3 flavors) keeps the same card size and leaves trailing empty space — cards do **not** stretch to fill the width. Each line header has a **collapse toggle**; collapsed/open state persists between visits. (Open: for big lines like Ultra (20), whether the row stays a single long horizontal swipe or wraps into a downward grid is decided on sight during build M1 — same cards either way.)
 - **A–Z / Z–A layout:** line grouping is dropped; a flat **vertical grid** of cards, sorted by **`nameMain`** (the displayed flavor name), not `nameTop`+`nameMain`.
 - **Filtering/search:** each line's row shows only matching flavors; lines with zero matches hide.
@@ -297,7 +300,8 @@ The catalog is a single JSON array, one object per flavor, loaded directly by th
 ```
 
 - `nameMain` is the dominant flavor text on the can body; `nameTop` is the smaller secondary line (descriptor / "Zero Sugar" / "Energy + Juice" / "" if none). Neither ever includes the word "Monster"; the line shows as a separate tag and is not repeated in `nameMain`.
-- `accentColor` drives the stylized SVG can (the can body color); required for every flavor. `accentConfidence` is `verified` or `estimated` — many are estimated and need tuning against real can art during build polish (M6).
+- `accentColor` drives the stylized SVG can (the can body color); required for every flavor. `accentConfidence` is `verified` or `estimated`. **As of the post-M6 update (2026-06-20) every entry is `verified`** — colors confirmed by Newt; no hex tuning remains.
+- `clawColor` (optional hex) is the color of the can's claw/logo, for cans whose claw isn't simply the auto-contrast ink (e.g. a black can with a green claw). When absent, the claw uses the luminance-derived ink (near-black or white) as before. Present on 42 of 88 cans. Customs have no `clawColor` (claw falls back to ink).
 - `alcoholic` (boolean) marks the Beast lines; full catalog members, but powers the "hide alcoholic" filter + on-can tag (§5.1).
 - `uncertain` (boolean) was used to flag entries discontinued in some markets but still produced elsewhere, or otherwise unverified. **Currently unused — every entry is `false`** (the catalog is finalized; confidence is tracked solely via `accentConfidence`). The field is retained in the schema for backward compatibility and possible future re-flagging.
 - `markets` and `source` are reference metadata, never fetched at runtime. `aliases` is bundled too and additionally powers local search matching (§5.1) — it is matched in-app, never network-fetched.

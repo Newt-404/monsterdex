@@ -1,5 +1,5 @@
-/* Parametric can styling (from the CAN_SVG template). Each <Can> sets --can-color
-   and --ink inline; these classes resolve against them. */
+/* Parametric can styling (from the CAN_SVG template). Each <Can> sets --can-color,
+   --ink, and --claw inline; these classes resolve against them. */
 
 .can-svg {
   display: block;
@@ -24,8 +24,10 @@
   fill: var(--can-color);
 }
 
+/* Claw uses the per-flavor clawColor (via --claw); --claw falls back to --ink
+   (auto-contrast) when the catalog gives no clawColor. Text still uses --ink. */
 .can-claw {
-  fill: var(--ink);
+  fill: var(--claw);
 }
 
 .can-label {

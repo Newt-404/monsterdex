@@ -49,12 +49,21 @@
 }
 .stat-cap {
   color: var(--text-2);
+  /* Captions wrap to 1 or 2 lines depending on length ("Average Rating" wraps,
+     "Cans Logged" may not). Reserve 2 lines' height for every caption so the big
+     number below always starts at the same level — a single-line caption just
+     sits in the top of its reserved box, with the number aligned to the bottom. */
+  min-height: 2.4em;
+  line-height: 1.2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 .stat-num {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 40px;
+  font-size: var(--fs-stat-sm);
   line-height: 1;
   color: var(--accent); /* profile headline numbers are green (mockup) */
 }
@@ -62,7 +71,7 @@
   flex: 0 0 auto;
 }
 .stat-sub {
-  font-size: 11px;
+  font-size: var(--fs-micro);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -80,7 +89,7 @@
   margin-bottom: var(--space-4);
 }
 .ach-title {
-  font-size: 22px;
+  font-size: var(--fs-title);
   color: var(--text-1);
 }
 .ach-count {
@@ -147,13 +156,13 @@
   background: radial-gradient(circle, rgba(var(--accent-rgb), 0.3) 0%, rgba(var(--accent-rgb), 0) 66%);
 }
 .badge-qmark {
-  font-size: 26px;
+  font-size: var(--fs-qmark);
   color: var(--locked);
   letter-spacing: 0.04em;
 }
 
 .badge-title {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   line-height: 1.05;
   color: var(--text-2);
 }
@@ -161,16 +170,15 @@
   color: var(--text-1);
 }
 .badge-req {
-  /* 11px matches .badge-progress + the profile stat-sub; removes the lone fractional
-     size. The full type scale gets real tokens in the M6 design-tokens finalize. */
-  font-size: 11px;
+  /* --fs-micro matches .badge-progress + the profile stat-sub (the dense tile sub-text). */
+  font-size: var(--fs-micro);
   line-height: 1.25;
   color: var(--text-3);
 }
 .badge-progress {
   margin-top: auto;
   padding-top: var(--space-1);
-  font-size: 11px;
+  font-size: var(--fs-micro);
   font-weight: 600;
   color: var(--text-2);
 }

@@ -3,7 +3,7 @@
 // content (architecture §1); the custom-flavor editor floats above everything.
 
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
-import { activeTab, boot, customEditor, detailSlug, settingsOpen } from './store/state';
+import { activeTab, boot, customEditor, detailSlug, settingsOpen, showBirthday } from './store/state';
 import { startBadgeEngine } from './badges/engine';
 import { TabBar } from './ui/tab-bar';
 import { CanDefs } from './can/can-defs';
@@ -14,6 +14,7 @@ import { FlavorDetail } from './views/flavor-detail';
 import { CustomForm } from './views/custom-form';
 import { Settings } from './views/settings';
 import { BadgeUnlock } from './ui/badge-unlock';
+import { BirthdayOverlay } from './ui/birthday-overlay';
 import './styles/app.css';
 
 export function App() {
@@ -62,6 +63,7 @@ export function App() {
       {customEditor.value ? <CustomForm /> : null}
       {settingsOpen.value ? <Settings /> : null}
       <BadgeUnlock />
+      {showBirthday.value ? <BirthdayOverlay /> : null}
     </div>
   );
 }

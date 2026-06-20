@@ -25,6 +25,23 @@
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--r-card);
+  /* A small celebratory pop-in (M6 animation polish). */
+  animation: unlock-pop 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+@keyframes unlock-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .unlock-card {
+    animation: none;
+  }
 }
 
 .unlock-close {
@@ -48,7 +65,7 @@
 }
 
 .unlock-head {
-  font-size: 34px;
+  font-size: var(--fs-head);
   line-height: 0.95;
   color: var(--text-1);
 }
@@ -71,13 +88,13 @@
 }
 
 .unlock-title {
-  font-size: 21px;
+  font-size: var(--fs-title); /* shares the 22px section-title step (was 21px) */
   letter-spacing: 0.02em;
   color: var(--accent);
 }
 .unlock-req {
   margin-top: var(--space-2);
-  font-size: 14px;
+  font-size: var(--fs-base);
   color: var(--text-2);
 }
 
@@ -88,7 +105,7 @@
   background: var(--accent);
   color: var(--on-accent);
   border-radius: var(--r-button);
-  font-size: 16px;
+  font-size: var(--fs-body);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;

@@ -23,7 +23,7 @@ body {
   background: var(--bg);
   color: var(--text-1);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: var(--fs-body);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -55,14 +55,14 @@ input {
 /* Screen title — the big UPPERCASE display heading at the top of every tab
    (Catalog / Dashboard / Profile). tokens §2 screen title 40–48. */
 .screen-title {
-  font-size: 44px;
+  font-size: var(--fs-screen);
   color: var(--text-1);
   margin: var(--space-2) 0 var(--space-4);
 }
 
 /* Uppercase tracked caption (tokens §2 "Label / caption"). */
 .caption {
-  font-size: 12px;
+  font-size: var(--fs-label);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;

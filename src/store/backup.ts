@@ -290,45 +290,60 @@ function migrate(payload: BackupPayload): BackupPayload {
  *  replaces all data in one transaction (re-splitting photos, preserving orphans) and
  *  re-hydrates with celebrations suppressed — a restore never throws confetti. */
 export async function importBackup(payload: BackupPayload): Promise<void> {
-  // Step 4: auto-export current data as the one-tap undo, BEFORE we overwrite anything.
-  const undo = await buildPayload();
-  try {
-    await deliverFile(payloadToFile(undo, `monsterdex-before-restore-${nowISO().slice(0, 10)}.json`));
-  } catch (err) {
-    if (isAbort(err)) throw new Error('Import cancelled — your data is unchanged.');
-    throw err;
-  }
-
-  const data = migrate(payload);
-
-  // Re-split: decode each base64 photo back to a Blob, flag hasPhoto on the blob-free
-  // flavorState record, and strip the photo field (architecture §7 step 5).
-  const flavorState: Record<string, FlavorState> = {};
-  const photos: Record<string, Blob> = {};
-  for (const f of data.flavors) {
-    flavorState[f.slug] = {
-      rating: f.rating,
-      review: f.review,
-      count: f.count,
-      wishlist: f.wishlist,
-      hasPhoto: !!f.userPhoto,
-    };
-    if (f.userPhoto) {
-      try {
-        photos[f.slug] = dataURLToBlob(f.userPhoto);
-      } catch {
-        flavorState[f.slug].hasPhoto = false; // unreadable photo → keep the rest of the record
-      }
-    }
-  }
-
-  const unlockLog: Record<string, UnlockEntry> = {};
-  for (const [id, date] of Object.entries(data.unlockLog)) {
-    unlockLog[id] = { firstEarnedDate: date };
-  }
-
+  // Suppress celebrations for the WHOLE restore, not just the apply step (architecture §7
+  // step 6 — a restore is silent: every earned badge is already in the restored log). One
+  // outer try/finally so suppression is reset even if the undo-export below is cancelled,
+  // leaving the engine free to celebrate the next genuine earn. (Nothing before the apply
+  // mutates state, so no confetti could fire there anyway — this just makes the suppressed
+  // window match the "a restore never throws confetti" contract instead of relying on it.)
   setCelebrationsSuppressed(true);
   try {
+    // Step 4: auto-export current data as the one-tap undo, BEFORE we overwrite anything.
+    const undo = await buildPayload();
+    try {
+      await deliverFile(payloadToFile(undo, `monsterdex-before-restore-${nowISO().slice(0, 10)}.json`));
+    } catch (err) {
+      if (isAbort(err)) throw new Error('Import cancelled — your data is unchanged.');
+      throw err;
+    }
+
+    const data = migrate(payload);
+
+    // Re-split: decode each base64 photo back to a Blob, flag hasPhoto on the blob-free
+    // flavorState record, and strip the photo field (architecture §7 step 5).
+    const flavorState: Record<string, FlavorState> = {};
+    const photos: Record<string, Blob> = {};
+    for (const f of data.flavors) {
+      flavorState[f.slug] = {
+        rating: f.rating,
+        review: f.review,
+        count: f.count,
+        wishlist: f.wishlist,
+        hasPhoto: !!f.userPhoto,
+      };
+      if (f.userPhoto) {
+        try {
+          photos[f.slug] = dataURLToBlob(f.userPhoto);
+        } catch {
+          flavorState[f.slug].hasPhoto = false; // unreadable photo → keep the rest of the record
+        }
+      }
+    }
+
+    const unlockLog: Record<string, UnlockEntry> = {};
+    for (const [id, date] of Object.entries(data.unlockLog)) {
+      unlockLog[id] = { firstEarnedDate: date };
+    }
+
+    // Merge the app-lifecycle keys rather than overwriting them (deferred-decisions.md,
+    // resolved in M6 now that the first-launch flow sets them): keep the device's existing
+    // firstLaunchDate / birthdaySeen if already set, so restoring an OLDER backup — whose
+    // meta may carry birthdaySeen:false / firstLaunchDate:null — never replays the birthday
+    // overlay and never briefly un-satisfies The Origin. We read the live signals here,
+    // before hydrateUserState() below reloads them. Once seen, birthdaySeen stays sticky.
+    const mergedFirstLaunch = firstLaunchDate.value ?? data.meta.firstLaunchDate;
+    const mergedBirthdaySeen = birthdaySeen.value || data.meta.birthdaySeen;
+
     // Step 5: one transaction — clear + write unfiltered (orphans preserved).
     await replaceAllData({ flavorState, photos, customs: data.customs, unlockLog });
     // kv meta + settings (await before hydrate so the re-read sees the new values).
@@ -337,8 +352,8 @@ export async function importBackup(payload: BackupPayload): Promise<void> {
       putKv('backupCount', data.meta.backupCount),
       putKv('lastBackupAt', data.meta.lastBackupAt),
       putKv('changesSinceBackup', data.meta.changesSinceBackup),
-      putKv('firstLaunchDate', data.meta.firstLaunchDate),
-      putKv('birthdaySeen', data.meta.birthdaySeen),
+      putKv('firstLaunchDate', mergedFirstLaunch),
+      putKv('birthdaySeen', mergedBirthdaySeen),
       putKv('schemaVersion', SCHEMA_VERSION),
     ]);
     // Step 6: re-hydrate signals; the engine's effect runs here, but suppressed.

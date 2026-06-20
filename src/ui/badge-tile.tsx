@@ -24,7 +24,7 @@ export function BadgeTile({ view }: { view: BadgeView }) {
         {hidden ? (
           <span class="badge-qmark display">???</span>
         ) : (
-          <Glyph id={def.glyph} size={44} class="badge-glyph" />
+          <Glyph id={def.glyph} mod={def.glyphMod} size={44} class="badge-glyph" />
         )}
       </div>
 
@@ -42,16 +42,18 @@ export function BadgeTile({ view }: { view: BadgeView }) {
         </span>
       ) : progress ? (
         <div class="badge-progress">
-          {fmt(progress.current)} / {fmt(progress.target)}
+          {fmt(progress.current, progress.target)} / {fmt(progress.target, progress.target)}
         </div>
       ) : null}
     </div>
   );
 }
 
-/** Compact thousands (1,000) so the high can-ladders read cleanly in the narrow tile. */
-function fmt(n: number): string {
-  return n.toLocaleString('en-US');
+/** Format a progress number. A fractional `target` (the avg-gated badges, e.g.
+ *  Connoisseur's 4.5) renders both numbers to one decimal — "4.3 / 4.5"; an integer
+ *  target keeps the count ladders whole, with thousands separators ("1,000 / 1,000"). */
+function fmt(n: number, target: number): string {
+  return Number.isInteger(target) ? n.toLocaleString('en-US') : n.toFixed(1);
 }
 
 function LockIcon() {

@@ -15,7 +15,9 @@ Preact + Vite + TypeScript. State via `@preact/signals`. Persistence via `idb`
 (IndexedDB). Service worker via `vite-plugin-pwa` (Workbox). Confetti via
 `canvas-confetti`. **No router** (hash-driven tab state). **No chart library**
 (dashboard is hand-built CSS/SVG). Don't add dependencies beyond this set without
-flagging it first.
+flagging it first. (One build-only **devDependency** was added in M6 with approval:
+`sharp`, used solely by `scripts/gen-icons.mjs` to generate the PWA icon PNGs — not a
+runtime/bundle dep; the build and deploy don't need it.)
 
 ## Commands
 ```
@@ -75,6 +77,8 @@ src/views/  src/ui/
 - `monsterdex-build-plan.md` — M1–M6 milestones + review checkpoints.
 - `design-tokens.md` — color/type/spacing (still `EST`-laden; finalize in M6).
 - `asset-manifest.md` — every asset + status.
-- `catalog.json` — 88 flavors, 13 lines (hexes need M6 tuning).
+- `catalog.json` — 88 flavors, 13 lines. Colors **confirmed** (all `accentConfidence:
+  verified`); 42 cans carry a `clawColor` (the can's claw color; falls back to luminance
+  ink when absent).
 - `deferred-decisions.md` — intentionally postponed/settled UI choices; read
   before flagging "missing"/"off" UI as a bug.

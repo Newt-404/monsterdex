@@ -9,11 +9,20 @@
 //
 // `progress` is an optional {current,target} for the numeric-threshold ladders, shown
 // on locked tiles (e.g. mockup-profile.png "19 / 25"). Completion/boolean badges omit
-// it; avg-gated badges (Connoisseur's "4.3 / 4.5") also omit it for now — restoring
-// fractional-average progress is the open M6 call in deferred-decisions.md.
+// it. Avg-gated badges (Connoisseur, Impossible to Please) carry a fractional progress
+// (e.g. "4.3 / 4.5") — restored in M6 to match mockup-profile.png (deferred-decisions.md).
+// The tile renders a non-integer `target` with one decimal place; integer ladders stay
+// whole — so a single `progress` shape covers both without a format flag.
 
 import type { Snapshot } from './snapshot';
 import { MASTERABLE_LINES } from './snapshot';
+
+/** Optional emblem layered on a base glyph to differentiate a badge within its family
+ *  (PRD §5.11 Glyph column: "crowned", "loop", "+3", "all-lines"). Drawn in currentColor
+ *  by the Glyph component, so it recolors with lit/locked state like the base glyph.
+ *  Numeric per-tier pips on the long ladders are not shown in the mockup and stay
+ *  deferred (deferred-decisions.md) — these are the distinctive, named indicators only. */
+export type GlyphMod = 'crown' | 'loop' | 'tri' | 'ring';
 
 export type GlyphId =
   | 'claw'
@@ -60,6 +69,8 @@ export interface BadgeDef {
   secret: boolean; // "???" until first earned (a display attribute, orthogonal to kind)
   kind: 'dynamic' | 'permanent';
   glyph: GlyphId;
+  /** Optional differentiating emblem over the base glyph (PRD §5.11 Glyph column). */
+  glyphMod?: GlyphMod;
   isSatisfied(s: Snapshot): boolean;
   /** Optional locked-tile progress readout for numeric ladders. */
   progress?(s: Snapshot): { current: number; target: number };
@@ -90,9 +101,9 @@ export const BADGES: BadgeDef[] = [
   // ── Line mastery & breadth ────────────────────────────────────────────────
   // The 13 [Line] Master badges (one per masterable line, claw tinted in M6).
   ...LINE_MASTERS(),
-  { id: 'jack-of-all-cans', group: 'lines', title: 'Jack of All Cans', requirement: 'Try ≥1 flavor from every line', secret: false, kind: 'dynamic', glyph: 'claw', isSatisfied: (s) => s.linesWithAnyTried >= s.realLineCount, progress: (s) => ({ current: s.linesWithAnyTried, target: s.realLineCount }) },
-  { id: 'line-hunter', group: 'lines', title: 'Line Hunter', requirement: 'Master any 3 lines', secret: false, kind: 'dynamic', glyph: 'claw', ...atLeast((s) => s.masteredLineCount, 3) },
-  { id: 'apex-predator', group: 'lines', title: 'Apex Predator', requirement: 'Master all 13 lines', secret: false, kind: 'dynamic', glyph: 'claw', isSatisfied: (s) => s.masteredLineCount >= s.realLineCount, progress: (s) => ({ current: s.masteredLineCount, target: s.realLineCount }) },
+  { id: 'jack-of-all-cans', group: 'lines', title: 'Jack of All Cans', requirement: 'Try ≥1 flavor from every line', secret: false, kind: 'dynamic', glyph: 'claw', glyphMod: 'ring', isSatisfied: (s) => s.linesWithAnyTried >= s.realLineCount, progress: (s) => ({ current: s.linesWithAnyTried, target: s.realLineCount }) },
+  { id: 'line-hunter', group: 'lines', title: 'Line Hunter', requirement: 'Master any 3 lines', secret: false, kind: 'dynamic', glyph: 'claw', glyphMod: 'tri', ...atLeast((s) => s.masteredLineCount, 3) },
+  { id: 'apex-predator', group: 'lines', title: 'Apex Predator', requirement: 'Master all 13 lines', secret: false, kind: 'dynamic', glyph: 'claw', glyphMod: 'crown', isSatisfied: (s) => s.masteredLineCount >= s.realLineCount, progress: (s) => ({ current: s.masteredLineCount, target: s.realLineCount }) },
 
   // ── Built-in completion (never affected by customs) ──────────────────────
   { id: 'launch-list', group: 'builtin', title: 'The Launch List', requirement: 'Try every built-in flavor as shipped', secret: false, kind: 'permanent', glyph: 'shield', isSatisfied: (s) => s.builtinTotal > 0 && s.builtinTriedCount === s.builtinTotal, progress: (s) => ({ current: s.builtinTriedCount, target: s.builtinTotal }) },
@@ -108,7 +119,7 @@ export const BADGES: BadgeDef[] = [
   { id: 'perfectionist', group: 'praise', title: 'Perfectionist', requirement: 'Give 10 × 5★', secret: false, kind: 'dynamic', glyph: 'stars-triple', ...atLeast((s) => s.fiveStarCount, 10) },
   { id: 'gold-standard', group: 'praise', title: 'Gold Standard', requirement: 'Give 25 × 5★', secret: false, kind: 'dynamic', glyph: 'stars-triple', ...atLeast((s) => s.fiveStarCount, 25) },
   { id: 'hype-machine', group: 'praise', title: 'Hype Machine', requirement: 'Give 50 × 5★', secret: false, kind: 'dynamic', glyph: 'stars-triple', ...atLeast((s) => s.fiveStarCount, 50) },
-  { id: 'connoisseur', group: 'praise', title: 'Connoisseur', requirement: 'Average rating 4.5+ across ≥20 rated', secret: false, kind: 'dynamic', glyph: 'star', isSatisfied: (s) => s.ratedCount >= 20 && s.avgRating !== null && s.avgRating >= 4.5 },
+  { id: 'connoisseur', group: 'praise', title: 'Connoisseur', requirement: 'Average rating 4.5+ across ≥20 rated', secret: false, kind: 'dynamic', glyph: 'star', glyphMod: 'crown', isSatisfied: (s) => s.ratedCount >= 20 && s.avgRating !== null && s.avgRating >= 4.5, progress: (s) => ({ current: s.avgRating ?? 0, target: 4.5 }) },
 
   // ── Critic — 1★ given (≤ 1★, cap ≤ 88) ────────────────────────────────────
   { id: 'critic', group: 'critic', title: 'Critic', requirement: 'Give your first 1★', secret: false, kind: 'dynamic', glyph: 'star-broken', ...atLeast((s) => s.oneStarCount, 1) },
@@ -132,7 +143,7 @@ export const BADGES: BadgeDef[] = [
   { id: 'diabetes-speedrun', group: 'cans-total', title: 'Diabetes Speedrun', requirement: 'Log 5,000 cans', secret: false, kind: 'permanent', glyph: 'cans-pile', ...atLeast((s) => s.totalCans, 5000) },
 
   // ── Cans logged — single flavor (loyalty; uncapped) ──────────────────────
-  { id: 'regular', group: 'loyalty', title: 'Regular', requirement: 'Log 10 of one flavor', secret: false, kind: 'permanent', glyph: 'can-single', ...atLeast((s) => s.maxSingleFlavorCount, 10) },
+  { id: 'regular', group: 'loyalty', title: 'Regular', requirement: 'Log 10 of one flavor', secret: false, kind: 'permanent', glyph: 'can-single', glyphMod: 'loop', ...atLeast((s) => s.maxSingleFlavorCount, 10) },
   { id: 'die-hard', group: 'loyalty', title: 'Die-hard', requirement: 'Log 50 of one flavor', secret: false, kind: 'permanent', glyph: 'can-single', ...atLeast((s) => s.maxSingleFlavorCount, 50) },
   { id: 'obsessed', group: 'loyalty', title: 'Obsessed', requirement: 'Log 100 of one flavor', secret: false, kind: 'permanent', glyph: 'can-single', ...atLeast((s) => s.maxSingleFlavorCount, 100) },
   { id: 'ride-or-die', group: 'loyalty', title: 'Ride or Die', requirement: 'Log 250 of one flavor', secret: false, kind: 'permanent', glyph: 'can-single', ...atLeast((s) => s.maxSingleFlavorCount, 250) },
@@ -168,9 +179,9 @@ export const BADGES: BadgeDef[] = [
   { id: 'hoarder', group: 'secret', title: 'Hoarder', requirement: 'Keep 5 backups', secret: true, kind: 'permanent', glyph: 'shield', ...atLeast((s) => s.backupCount, 5) },
   { id: 'promises-kept', group: 'secret', title: 'Promises Kept', requirement: 'Try everything on your wishlist (≥5 wishlisted)', secret: true, kind: 'dynamic', glyph: 'heart', isSatisfied: (s) => s.wishlistedCount >= 5 && s.wishlistOpenCount === 0 },
   { id: 'so-close', group: 'secret', title: 'So Close', requirement: 'Exactly one flavor left untried', secret: true, kind: 'permanent', glyph: 'target', isSatisfied: (s) => s.catalogN - s.triedCount === 1 },
-  { id: 'one-track-mind', group: 'secret', title: 'One-Track Mind', requirement: 'Log 50+ of one flavor while < 10 tried', secret: true, kind: 'permanent', glyph: 'can-single', isSatisfied: (s) => s.maxSingleFlavorCount >= 50 && s.triedCount < 10 },
+  { id: 'one-track-mind', group: 'secret', title: 'One-Track Mind', requirement: 'Log 50+ of one flavor while < 10 tried', secret: true, kind: 'permanent', glyph: 'can-single', glyphMod: 'loop', isSatisfied: (s) => s.maxSingleFlavorCount >= 50 && s.triedCount < 10 },
   { id: 'hate-drinker', group: 'secret', title: 'Hate-Drinker', requirement: 'Log 10+ of a flavor you rated ≤2★', secret: true, kind: 'permanent', glyph: 'star-broken', isSatisfied: (s) => s.hasHateDrinkFlavor },
-  { id: 'impossible-to-please', group: 'secret', title: 'Impossible to Please', requirement: 'Average rating < 2.5 across ≥20 rated', secret: true, kind: 'dynamic', glyph: 'star-broken', isSatisfied: (s) => s.ratedCount >= 20 && s.avgRating !== null && s.avgRating < 2.5 },
+  { id: 'impossible-to-please', group: 'secret', title: 'Impossible to Please', requirement: 'Average rating < 2.5 across ≥20 rated', secret: true, kind: 'dynamic', glyph: 'star-broken', isSatisfied: (s) => s.ratedCount >= 20 && s.avgRating !== null && s.avgRating < 2.5, progress: (s) => ({ current: s.avgRating ?? 0, target: 2.5 }) },
   { id: 'fence-sitter', group: 'secret', title: 'Fence Sitter', requirement: '≥20 rated and every rating 2.5–3.5★', secret: true, kind: 'permanent', glyph: 'balance-scale', isSatisfied: (s) => s.ratedCount >= 20 && s.allRatedInFenceBand },
   { id: 'npc-behavior', group: 'secret', title: 'NPC Behavior', requirement: 'Every flavor rated, all ratings ≥4★', secret: true, kind: 'permanent', glyph: 'star', isSatisfied: (s) => s.everyFlavorRated && s.allRatedGTE4 },
   { id: 'no-one-liked-you', group: 'secret', title: 'No one liked you in school huh?', requirement: 'Every flavor rated, all ratings ≤2★', secret: true, kind: 'permanent', glyph: 'star-broken', isSatisfied: (s) => s.everyFlavorRated && s.allRatedLTE2 },

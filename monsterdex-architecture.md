@@ -258,5 +258,6 @@ returns; the flag is carried in backups so a restore won't replay it.
 - **Big-line catalog layout** (Ultra = 20): swipe-row vs. wrapping grid — decide
   on sight in M1 (same cards either way).
 - **Can SVG v2 visual refinement** — construction locked (PRD §8); refine in M6.
-- **Hex tuning** of estimated `accentColor`s — M6 against real can art.
+- **Hex tuning** of `accentColor`s — DONE (post-M6 user-supplied catalog, 2026-06-20: all
+  `verified`, + per-can `clawColor` on 42 cans). No remaining color work.
 - **Hero renders** — author/source later; the resolver tier is already wired (§5).

@@ -26,15 +26,23 @@ import { Claw } from '../can/claw';
 import { type Flavor } from '../types';
 import '../styles/catalog.css';
 
+// "By rating" moved out of the segmented control into a FilterChips toggle (it
+// sorts the list, while the segmented options group/sort it). The three here are
+// the canonical PRD §5.1 sorts; 'rating' lives on the chip below.
 const SORTS: { id: SortMode; label: string }[] = [
   { id: 'by-line', label: 'By line' },
   { id: 'az', label: 'A–Z' },
   { id: 'za', label: 'Z–A' },
-  { id: 'rating', label: 'By rating' },
 ];
 
 export function Catalog() {
   const mode = sortMode.value;
+  // Empty-state (M6 polish): a live filter/search can match nothing. Show a message
+  // rather than a blank gap below the chips — but only when a filter is actually active,
+  // so the one-frame boot tick (catalog not yet hydrated) doesn't flash it.
+  const noMatches =
+    (mode === 'by-line' ? catalogByLine.value.length === 0 : catalogSorted.value.length === 0) &&
+    filterActive.value;
   return (
     <div class="catalog">
       <h1 class="screen-title display">Catalog</h1>
@@ -69,7 +77,13 @@ export function Catalog() {
 
       <FilterChips />
 
-      {mode === 'by-line' ? <ByLine /> : <FlatGrid />}
+      {noMatches ? (
+        <p class="catalog-empty">No flavors match your search.</p>
+      ) : mode === 'by-line' ? (
+        <ByLine />
+      ) : (
+        <FlatGrid />
+      )}
 
       <button class="add-custom" onClick={openAddCustom}>
         <PlusIcon /> Add custom flavor
@@ -142,6 +156,7 @@ function FlatGrid() {
 
 function FilterChips() {
   const tried = triedFilter.value;
+  const mode = sortMode.value; // for the By-rating toggle chip below
   return (
     <div class="chips no-scrollbar">
       <button
@@ -162,6 +177,16 @@ function FilterChips() {
       >
         <HeartOutline /> Wishlist
       </button>
+      {/* "By rating" is a sort, not a filter — it coexists with the filters above
+          (they trim the list; this re-orders it). Toggling on sorts by rating;
+          toggling off (or picking a segmented option) reverts to the default
+          'by-line' grouping. Active iff sortMode is currently 'rating'. */}
+      <button
+        class={`chip${mode === 'rating' ? ' active' : ''}`}
+        onClick={() => (sortMode.value = mode === 'rating' ? 'by-line' : 'rating')}
+      >
+        <StarOutline /> By rating
+      </button>
     </div>
   );
 }
@@ -170,8 +195,9 @@ function FilterChips() {
 function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-3)" stroke-width="2" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-3.5-3.5" stroke-linecap="round" />
+      {/* Magnifying glass: round lens + a diagonal handle off its lower-right rim. */}
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M15.5 15.5L21 21" stroke-linecap="round" />
     </svg>
   );
 }
@@ -208,6 +234,13 @@ function CircleOutline() {
   return (
     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <circle cx="12" cy="12" r="9" />
+    </svg>
+  );
+}
+function StarOutline() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.9 6.6 19.4l1.2-6L3.4 9.3l6-.7z" />
     </svg>
   );
 }

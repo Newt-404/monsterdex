@@ -18,7 +18,10 @@ export default defineConfig({
       // next launch, no "reload?" prompt (architecture §6).
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['icons/app-icon.jpg'],
+      // Assets referenced outside the manifest (iOS home-screen + browser tab) — kept in
+      // the precache so they're available offline. The manifest icons below precache via
+      // the workbox png glob.
+      includeAssets: ['icons/apple-touch-icon.png', 'icons/favicon-32.png'],
       manifest: {
         name: 'MonsterDex',
         short_name: 'MonsterDex',
@@ -28,20 +31,22 @@ export default defineConfig({
         orientation: 'portrait',
         background_color: '#0B0B0C',
         theme_color: '#0B0B0C',
-        // Only `any` — the master is a full-bleed squircle with no maskable safe-area
-        // padding, so declaring it `maskable` would let Android clip the claw inside the
-        // mask. The padded maskable PNG is deferred with the rest of the icon pipeline
-        // (asset-manifest §1 / deferred-decisions.md). iOS uses the apple-touch-icon.
+        // Optimized PNG set generated in M6 from the master (`npm run gen:icons`,
+        // asset-manifest §1). `any` carries the full-bleed squircle at 192/512; the
+        // dedicated `maskable` 512 insets the claw into the safe area so Android's mask
+        // can't clip it. iOS uses the apple-touch-icon in index.html.
         icons: [
-          { src: 'icons/app-icon.jpg', sizes: '1254x1254', type: 'image/jpeg', purpose: 'any' },
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        // Precache the shell + catalog.json + bundled Anton font + glyphs + icons so the
-        // app is fully functional offline from first launch (architecture §6, PRD §7).
-        // The icon is `.jpg` today; `png`/`ico` are kept deliberately so the deferred
-        // multi-size icon set (asset-manifest §1) precaches automatically when it lands.
-        globPatterns: ['**/*.{js,css,html,json,woff2,svg,png,jpg,ico}'],
+        // Precache the shell + catalog.json + bundled Anton font + glyphs + the PNG icon
+        // set so the app is fully functional offline from first launch (architecture §6,
+        // PRD §7). `jpg` is intentionally excluded so the build-only master `app-icon.jpg`
+        // (the gen-icons source) isn't precached; `ico` stays for a possible future favicon.ico.
+        globPatterns: ['**/*.{js,css,html,json,woff2,svg,png,ico}'],
         // Dormant render tier (architecture §5/§6): a CacheFirst route for future bundled
         // /renders/*.png. No assets serve it in v1 — wired, not used.
         runtimeCaching: [

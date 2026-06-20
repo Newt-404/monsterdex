@@ -63,13 +63,35 @@ sub-category label in `--text-2`.
 }
 ```
 
-| Role            | Font           | Size (EST) | Weight | Notes |
-|-----------------|----------------|-----------:|--------|-------|
-| Screen title    | display        | 40–48px    | 800    | UPPERCASE, tight tracking (~-0.01em) |
-| Big stat number | display        | 56–72px    | 800    | e.g. `3.88`, `147`, `162` |
-| Card title      | display / body | 17–18px    | 700    | flavor names, section headers |
-| Body / review   | body           | 15–16px    | 400–500| |
-| Label / caption | body           | 12–13px    | 600    | UPPERCASE, +tracking (~0.06em) — "YOUR PROGRESS" |
+**Type scale — FINALIZED (M6).** The eyeballed `EST` ranges below were pinned to the
+running app and live as tokens in `src/styles/tokens.css` (`--fs-*`). Views reference the
+token, never a literal, so the scale has one home. The dashboard, profile/achievements,
+and the overlays (badge-unlock, birthday) are fully on these tokens; the small end
+(`--fs-micro` 11 / `--fs-2xs` 10) is the deliberately-dense By-Line + tile sub-text, kept
+compact so the narrow columns don't clip (see `deferred-decisions.md`).
+
+| Token | Size | Role |
+|-------|-----:|------|
+| `--fs-display`   | clamp(52→104px) | birthday hero headline (viewport-scaled) |
+| `--fs-screen`    | 44px | screen titles (Catalog / Dashboard / Profile) |
+| `--fs-stat`      | 60px | dashboard big number (`3.88`, `147`) |
+| `--fs-stat-sm`   | 40px | profile headline stat numbers |
+| `--fs-head`      | 34px | unlock-popup "ACHIEVEMENT UNLOCKED" |
+| `--fs-cta`       | 28px | birthday hero button |
+| `--fs-qmark`     | 26px | secret-tile "???" |
+| `--fs-title`     | 22px | section + popup titles (ACHIEVEMENTS, badge name) |
+| `--fs-lg`        | 18px | progress line / card title |
+| `--fs-body`      | 16px | body / review |
+| `--fs-md`        | 15px | ranked-list numerals |
+| `--fs-base`      | 14px | default UI text |
+| `--fs-sm`        | 13px | small tile / list text |
+| `--fs-label`     | 12px | label / caption (UPPERCASE, +tracking) |
+| `--fs-micro`     | 11px | dense tile sub-text + By-Line values |
+| `--fs-2xs`       | 10px | By-Line column header |
+
+Display weight comes from the Anton face itself (it ships one weight); the old "800"
+column was notional. Other views (catalog, detail, settings, custom-form) sit on the same
+size ramp and can adopt the tokens incrementally — values already match the steps above.
 
 Display font note: Anton gets ~90% of the mockup look. The mockups add
 extra letter-tightening and a faint grain texture on some headers (e.g. the
@@ -164,6 +186,9 @@ Dark theme only (PRD §9). No light-mode tokens.
 3. **Display face → RESOLVED: Anton** (bundled `.woff2`), for v1. Revisit only
    if it reads wrong in the real app.
 
-> Status: these values are still **estimate-laden** (the `EST` colors in §1 and
-> the type sizes are eyeballed from the mockups). Treat as a working draft —
-> finalize against the real app during build polish (M6).
+> Status: the **type scale is finalized** (§2 — now real `--fs-*` tokens, applied across
+> the dashboard / profile / overlays). The **`EST` surface/text colors in §1** are kept
+> as-is — they read correctly in the running app. **Per-flavor catalog colors are now
+> CONFIRMED** (post-M6 user update, 2026-06-20): every `accentColor` is `verified` and 42
+> cans carry a `clawColor` — no hex tuning remains. (Catalog colors are flavor data, not
+> tokens here; the green UI accent `#7CFC00` is unchanged.)

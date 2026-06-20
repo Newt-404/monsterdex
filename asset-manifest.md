@@ -16,11 +16,11 @@ Hero flavors can use real bundled renders for an exact mockup match.
 ## 1. App & PWA icons
 | Asset | Format | Source | Status |
 |-------|--------|--------|--------|
-| Master app icon | 1024px | `mockup-app-icon.png` (matte tile + green claw) | DONE (source exists) |
-| `icon-192`, `icon-512` | PNG | from master | BUILD-TIME |
-| `icon-512-maskable` (safe-area padded) | PNG | from master | BUILD-TIME |
-| `apple-touch-icon` (180) | PNG | from master | BUILD-TIME |
-| `favicon` | ICO/PNG | from master | BUILD-TIME |
+| Master app icon | 1254px | `public/icons/app-icon.jpg` (matte tile + green claw) | DONE (source exists) |
+| `icon-192`, `icon-512` | PNG | from master via `npm run gen:icons` (sharp) | DONE (M6) |
+| `icon-512-maskable` (safe-area padded) | PNG | master inset ~78% on `--bg` | DONE (M6) |
+| `apple-touch-icon` (180) | PNG | from master | DONE (M6) |
+| `favicon-32` | PNG | from master | DONE (M6) |
 
 ---
 
@@ -100,7 +100,7 @@ claw medallion, ribbon, green glow (`--glow-strong`). Status: TO-AUTHOR.
 ## 8. Data
 | Asset | Format | Status |
 |-------|--------|--------|
-| Catalog | `catalog.json` (slug, line, nameTop, nameMain, accentColor, accentConfidence, markets, aliases, uncertain, alcoholic, source) | DONE — 88 flavors, 13 lines (hexes need M6 tuning) |
+| Catalog | `catalog.json` (slug, line, nameTop, nameMain, accentColor, accentConfidence, clawColor?, markets, aliases, uncertain, alcoholic, source) | DONE — 88 flavors, 13 lines; **colors confirmed** (all `verified`, 42 with `clawColor`) |
 
 ---
 

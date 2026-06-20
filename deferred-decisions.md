@@ -5,7 +5,8 @@ so future work and cold reviews don't re-litigate them. **Read this before flagg
 "missing" / "off" UI as a bug** — many dashboard/catalog/By-Line details are
 deliberate and tracked here.
 
-Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
+Last updated: 2026-06-20 (after M6 — polish: birthday/first-launch, type-scale finalize,
+glyph mods, PWA icons; hex tuning + claw tint deferred to Phase D).
 
 ---
 
@@ -53,17 +54,17 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 
 ## M5 — Backup/restore + offline PWA (settled choices — do NOT re-flag)
 
-- **PWA icons = the master JPEG referenced directly, no generation step (yet).**
-  `public/icons/app-icon.jpg` is a byte-copy of `mockups/mockup-app-icon.png` (which is
-  actually JPEG bytes — a clean 1254×1254 square: black squircle + green claw). The
-  manifest references it for `any` only (no `maskable` — the unpadded full-bleed master
-  would clip on Android; the padded maskable PNG is deferred below), and `index.html`
-  uses it as the iOS `apple-touch-icon`. **The optimized multi-size PNG set (192/512/maskable-padded/
-  apple-touch) that asset-manifest §1 marks `BUILD-TIME` is deferred** — generating it
-  needs an image-resize tool (sharp / `@vite-pwa/assets-generator`), a new dependency,
-  and CLAUDE.md says flag deps first. The direct JPEG gives a correct home-screen install
-  now (iOS accepts JPEG apple-touch-icons); the PNG pipeline is an M6 / device-test polish
-  item. **Surfaced, not silently skipped.**
+- **PWA icons → RESOLVED in M6: optimized PNG set generated** (the dependency was flagged
+  and approved — Newt's call, 2026-06-20). `scripts/gen-icons.mjs` (run via
+  `npm run gen:icons`) uses **`sharp`** (a *dev*Dependency) to derive `icon-192`,
+  `icon-512`, `icon-512-maskable` (master inset ~78% on the app bg so Android's mask
+  can't clip the claw), `apple-touch-icon` (180), and `favicon-32` from the master
+  `public/icons/app-icon.jpg`. The PNGs are **committed static files**, so the build
+  (`tsc && vite build`) and the GitHub Pages deploy need no image tooling — only
+  regeneration does. The manifest now lists the 192/512/maskable PNGs; `index.html`
+  points the apple-touch-icon + favicon at the PNGs. The master jpg stays as the source.
+  The maskable safe-area inset is **78%** (no doc pins the exact %); fine as chosen,
+  revisit only if the claw looks tight inside Android's mask on a real device.
 - **`apple-touch-icon` href is hard-coded to the `/monsterdex/` base** in `index.html`
   (Safari ignores the web manifest for the home-screen icon, and Vite doesn't rewrite
   arbitrary `<link>` hrefs). It must track `base` in `vite.config.ts` — both carry a
@@ -95,35 +96,55 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 
 ## Deferred to a later milestone (intentional — not bugs)
 
-### Visual / polish → M6 (final polish pass)
-- **By-Line claw color** — claws render in UI-green (`--accent`) for every line.
-  The mockup tints each claw its line's color. Deferred until the per-flavor /
-  per-line accent colors are confirmed against real can art (M6 hex tuning). Do
-  **not** tint per line until those colors are locked.
-- **Badge glyph visual refinement** (M4 → M6) — the ~21 base glyphs in `glyphs.tsx`
-  are functional but rough in places (the **infinity** glyph path especially); the
-  per-tier indicators / crowned / loop / per-line claw tint are also unbuilt (see
-  the M4 section). Refine glyph shapes + add tier differentiation in the M6 polish
-  pass, at real size with the bundled font.
-- **Off-token hardcoded px** in `dashboard.css` (the By-Line box especially: gaps,
-  font-sizes 9–12px, column widths, the `60px` / `40px` big-stat sizes) **and in
-  `profile.css` / `badge-unlock.css`** (achievements grid + unlock popup: type sizes
-  `11–34px`, tile `min-height:138px`, art `52px`, check chip `22px`). To be
-  reconciled into a real type-scale in `design-tokens.md` during the M6 finalize
-  pass. (`--accent-rgb` was tokenised in M4; type sizes are the remaining gap.)
+### Visual / polish → M6
+- **Catalog colors are now CONFIRMED (post-M6 user update, 2026-06-20).** Newt supplied a
+  finalized catalog: 24 `accentColor` values changed, **all 88 flipped to
+  `accentConfidence: "verified"`**, plus a new per-can **`clawColor`** field on 42 cans
+  (the claw is rendered in `clawColor` when present, else the luminance ink — see
+  `can.tsx` `--claw`). **Hex tuning is no longer a Phase-D item.**
+- **By-Line claw color (the dashboard table's per-line claw glyph)** — STILL not tinted
+  (renders UI-green `--accent` for every line); the mockup tints each per its line color.
+  This was blocked on locked colors; now **unblocked** (colors confirmed above) but **not
+  requested** in the post-M6 change set, so left as-is. Note: this is the small claw in the
+  By-Line dashboard rows — distinct from the per-can `clawColor` (which IS applied).
+- **Badge glyph visual refinement** — DONE in M6 (partial-by-design): the **infinity**
+  glyph was rebuilt as a clean lemniscate, and the **distinctive named indicators** from
+  the PRD §5.11 Glyph column are now drawn via an optional `glyphMod` — **crown**
+  (Connoisseur, Apex Predator), **loop** (Regular, One-Track Mind), **"3"** dots (Line
+  Hunter), **all-lines ring** (Jack of All Cans). The numeric **"+tier" pips** on the long
+  ladders (Decisive, Gold Standard, Hater, …) are **intentionally NOT drawn** — they aren't
+  shown in `mockup-profile.png` and have no precise visual spec; the base glyph already
+  differs per family. Adding tier pips later is a pure nicety, not a parity gap. Per-line
+  claw tint stays with the colors (above).
+- **Off-token hardcoded px** — DONE in M6. A finalized type scale (`--fs-*`) lives in
+  `tokens.css` and is documented in `design-tokens.md §2`; `dashboard.css`, `profile.css`,
+  `badge-unlock.css` (+ the new `birthday.css` and `global.css`) reference the tokens
+  instead of literals (values unchanged, except the unlock title 21→22px to share the
+  section-title step). The deliberately-dense By-Line micro sizes are now `--fs-micro`
+  (11) / `--fs-2xs` (10) — still compact by design. Other views (catalog, detail,
+  settings, custom-form) sit on the same ramp and can adopt tokens incrementally.
 - **Fragile `margin-right:-6px` nudge** on `.byline-tried` (pulls TRIED toward
   AVG) — depends on exact column widths; fine now, revisit with a sturdier
   approach if digit counts / fonts change.
 
 ### Features to add later
 - **Top Flavors per-row stars** — the mockup shows a ½-star row under each
-  top-flavor name; current rows show the number only. To be added later (will also
-  retire the now-vestigial `.dash-top .rank-val` CSS in `dashboard.css` at that time).
-- **"View all top flavors" link** — currently an inert label (`cursor:default`,
-  no handler). To be wired to a destination later (no target screen in v1 yet).
-- **"By rating" sort** — `SortMode` includes `'rating'` and `catalogSorted` handles
-  it, but no segmented-control button exposes it. Decide later: surface it or
-  remove the dead branch.
+  top-flavor name; current rows show the number only. To be added later. (The
+  `.dash-top .rank-val` CSS is still live — Top Flavors rows show a value — so it is NOT
+  vestigial after the changes below.)
+
+### Resolved in the post-M6 user change set (2026-06-20) — do NOT re-flag
+- **"View all top flavors" link → REMOVED; list uncapped.** The inert "view all" label is
+  gone and `topFlavors` is no longer sliced to 5 (`stats.ts`) — Top Flavors now shows every
+  rated flavor, ranked, and the list fills the card height (`.dash-top .rank-list`
+  `flex:1; space-between`) beside the taller By-Line table (changes.md item 4). Most Drunk
+  stays top-3 per PRD §5.8.
+- **"By rating" sort → RESOLVED: KEPT, moved into the filter-chip row.** No longer in the
+  segmented control (which is back to the three PRD §5.1 sorts: By line / A–Z / Z–A). It's
+  now a toggle chip beside Tried / Not-tried / Wishlist (`catalog.tsx`): toggles
+  `sortMode` between `'rating'` and `'by-line'`, coexists with the filters. PRD §5.1 should
+  be updated to mention the rating sort as a chip (doc follow-up; the divergence is now an
+  intentional, Newt-approved feature).
 
 ---
 
@@ -151,25 +172,18 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 
 ---
 
-## Pending a decision (not yet resolved)
-- **Connoisseur (and other avg-gated) locked-tile progress → decide in M6.** M4
-  shows a `current / target` progress line only on integer-count ladders; avg- and
-  boolean-gated badges show their requirement text with no progress number. But
-  `mockup-profile.png` explicitly renders **"4.3 / 4.5"** under a locked Connoisseur
-  tile (a fractional running-average progress). Decide in M6 whether to restore
-  fractional-avg progress (Connoisseur, Impossible to Please) to match the mockup,
-  or keep the integer-ladder-only rule and accept the divergence. Flagged by the M4
-  cold review so it isn't silently dropped.
-- **Import: merge vs. overwrite the lifecycle keys (`firstLaunchDate` /
-  `birthdaySeen`) → decide when M6 wires first-launch (Newt's call, deferred 2026-06-20).**
-  M5 import currently **overwrites** them with the backup's meta (architecture §7
-  step 6 restores meta as-is). Harmless today — nothing sets them in ≤M5. But once M6
-  records `firstLaunchDate` / sets `birthdaySeen=true` on a device, restoring an older
-  backup whose meta has `birthdaySeen:false` would **replay the birthday overlay**, and
-  `firstLaunchDate:null` would briefly un-satisfy The Origin (it stays *lit* — permanent
-  + restored log). Fix direction when M6 lands: merge (keep the local value if already
-  set) rather than overwrite. Flagged by the M5 cold review. *Reset already keeps these
-  keys — see the M5 settled section; this is only about the import path.*
+## Pending a decision (RESOLVED in M6)
+- **Connoisseur (and other avg-gated) locked-tile progress → RESOLVED in M6: restore
+  fractional-avg progress** (Newt's call, 2026-06-20). Connoisseur and Impossible to
+  Please now carry a `progress` returning `{current: avgRating, target}` (4.5 / 2.5).
+  `badge-tile.tsx` renders a non-integer `target` to one decimal ("4.3 / 4.5") while
+  integer ladders stay whole ("19 / 25") — one `progress` shape, no format flag. Other
+  boolean/completion badges still show requirement text only (unchanged).
+- **Import: merge vs. overwrite the lifecycle keys → RESOLVED in M6: merge** (keep local
+  if already set). `importBackup` now reads the live `firstLaunchDate` / `birthdaySeen`
+  signals before the restore and writes `local ?? backup` / `local || backup`, so
+  restoring an older backup never replays the birthday overlay and never un-satisfies
+  The Origin. *Reset already keeps these keys (M5 settled section).*
 
 ---
 

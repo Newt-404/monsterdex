@@ -36,7 +36,7 @@ export interface DashboardStats {
   ratedCount: number;
   /** 5★ → 1★ rows; `pct` is share of rated flavors (0 when nothing rated). */
   distribution: { star: number; count: number; pct: number }[];
-  topFlavors: RankedFlavor[]; // highest-rated first, up to 5
+  topFlavors: RankedFlavor[]; // highest-rated first, capped to ~fill the By-Line card height
   lines: LineStat[]; // the 13 real lines, then the Custom bucket if non-empty
   totalCans: number;
   mostDrunk: RankedFlavor[]; // most-logged first, up to 3
@@ -119,7 +119,15 @@ export const dashboardStats = computed<DashboardStats>(() => {
     b.value - a.value ||
     a.flavor.nameMain.localeCompare(b.flavor.nameMain, undefined, { sensitivity: 'base' });
 
-  const topFlavors = [...rated].sort(byValueThenName).slice(0, 5);
+  // Top Flavors is capped (was top-5 behind a now-removed "view all" link): show enough
+  // rows to fill the card to roughly the same height as the By-Line table beside it — NOT
+  // every rated flavor (changes.md item 4). The By-Line card is ~13 short rows; a ranked
+  // row is taller (it carries a can thumbnail), so ~10 rows match its height. The list
+  // uses `space-between` (dashboard.css) to absorb any small remainder without dead space.
+  // Tunable: bump if the card reads short next to By-Line on device. Most Drunk stays
+  // top-3 per PRD §5.8.
+  const TOP_FLAVORS_MAX = 10;
+  const topFlavors = [...rated].sort(byValueThenName).slice(0, TOP_FLAVORS_MAX);
   const mostDrunk = [...logged].sort(byValueThenName).slice(0, 3);
 
   // Real lines in canonical order, then the conditional Custom bucket last.

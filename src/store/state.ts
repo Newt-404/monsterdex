@@ -98,6 +98,10 @@ export const firstLaunchDate = signal<string | null>(null);
 /** Whether the birthday overlay has been dismissed (kv meta, architecture §8). Set
  *  by the M6 first-launch flow; carried in backups so a restore never replays it. */
 export const birthdaySeen = signal<boolean>(false);
+/** Whether the birthday overlay is on screen right now (transient UI, not persisted —
+ *  birthdaySeen is the durable flag). Raised on first launch by {@link boot}, lowered
+ *  by {@link dismissBirthday}. */
+export const showBirthday = signal<boolean>(false);
 
 /** Current user record for a slug (the cold-start zero state if untouched). */
 export function stateOf(slug: string): FlavorState {
@@ -149,10 +153,34 @@ export async function boot(): Promise<void> {
 
   await hydrateUserState();
 
+  // First-launch flow (architecture §8 / PRD §5.12): "first launch is the moment" — no
+  // calendar logic. Stamp firstLaunchDate exactly once. Because it is set BEFORE the app
+  // shell starts the badge engine, the engine's first (suppressed) pass sees
+  // originRecorded=true and logs The Origin silently — the birthday overlay is the
+  // celebration, not a popup. Raise the overlay whenever birthdaySeen is still false;
+  // birthdaySeen latches it shut forever (persisted + carried in backups), so it never
+  // returns, and a same-session re-stamp can't replay it.
+  if (firstLaunchDate.value === null) {
+    const now = new Date().toISOString();
+    firstLaunchDate.value = now;
+    await putKv('firstLaunchDate', now);
+  }
+  if (!birthdaySeen.value) showBirthday.value = true;
+
   // Stamp the schema version on first boot (drives M5 migration); harmless if set.
   void putKv('schemaVersion', SCHEMA_VERSION);
   // The badge engine is started by the app shell once this hydrate resolves
   // (its first pass back-fills lit state silently — architecture §3/§4).
+}
+
+/** Dismiss the birthday overlay (PRD §5.12): latch birthdaySeen so it never reappears
+ *  (persisted; carried in backups so a restore won't replay it) and lower the overlay. */
+export function dismissBirthday(): void {
+  showBirthday.value = false;
+  if (!birthdaySeen.value) {
+    birthdaySeen.value = true;
+    void putKv('birthdaySeen', true);
+  }
 }
 
 /** Read every user store + meta key from IndexedDB into the signals in one batch.
@@ -332,8 +360,14 @@ export const filterActive = computed<boolean>(
 
 function matchesSearch(f: Flavor, q: string): boolean {
   if (!q) return true;
-  const hay = [f.nameMain, f.nameTop, ...f.aliases].join(' ').toLowerCase();
-  return hay.includes(q);
+  // Include the line so "Ultra White" can match (the line lives on f.line, not in
+  // the name). Match token-wise (AND): split the query on whitespace and require
+  // every token to appear in the haystack. A single `includes(q)` would fail when
+  // the words span line+name (or arrive in a different order) — token matching lets
+  // "Ultra White" hit the Ultra-line flavor named "White", while a single-word query
+  // is just one token and behaves exactly as before.
+  const hay = [f.line, f.nameMain, f.nameTop, ...f.aliases].join(' ').toLowerCase();
+  return q.split(/\s+/).every((token) => hay.includes(token));
 }
 
 /** The live filter predicate, applied in every layout. */

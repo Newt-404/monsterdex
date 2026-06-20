@@ -117,12 +117,10 @@ feature — stop and defer.
 **Goal:** close the gap to the mockups; finalize the estimate-laden values.
 
 - Can SVG v2 **visual refinement** in-app at real size with the bundled font.
-- **Hex tuning** of the **71 `accentConfidence: estimated` colors** against real
-  can art. Priority: the **11 alcoholic** first (all estimated), then the
-  remaining **60** estimated colors (the full Java line — now 11 — most of Juice,
-  several Original incl. Zero Sugar). The `uncertain` flag is no longer used —
-  every entry is verified-or-estimated and none are flagged, so there is no
-  separate entry re-check list; confidence is purely `verified` vs `estimated`.
+- **Hex tuning** — **DONE via a post-M6 user-supplied catalog (2026-06-20), not an
+  in-build estimate.** Newt provided finalized colors: 24 `accentColor` values changed,
+  **all 88 flipped to `accentConfidence: verified`**, plus a new per-can `clawColor` on 42
+  cans. No on-device hex pass remains; Phase D no longer needs a color-verification step.
 - Birthday welcome screen (`mockup-birthday.png`) final pass + confetti; first-launch
   trigger + The Origin (architecture §8).
 - Finalize `design-tokens.md` against the running app (it's still `EST`-laden).

@@ -84,10 +84,6 @@ export function Dashboard() {
               ))}
             </ol>
           )}
-          {/* Visual-parity link to a future "all top flavors" screen (not wired yet). */}
-          {s.topFlavors.length > 0 ? (
-            <div class="dash-viewall caption">View all top flavors ›</div>
-          ) : null}
         </section>
 
         <section class="panel dash-byline">
@@ -160,9 +156,9 @@ function RankRow({ rank, r, children }: { rank: number; r: RankedFlavor; childre
     <li class="rank-row">
       <span class="rank-num display">{rank}</span>
       <span class="rank-thumb">
-        <FlavorImage flavor={r.flavor} width={22} />
+        <FlavorImage flavor={r.flavor} width={20} />
       </span>
-      <span class="rank-name display">{r.flavor.nameMain}</span>
+      <span class="rank-name">{r.flavor.nameMain}</span>
       {children}
     </li>
   );
