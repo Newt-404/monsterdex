@@ -263,8 +263,13 @@
   flex: 0 0 auto;
 }
 .byline-line {
+  /* Body font (not the heavy Anton display face) at a medium weight — a lighter
+     line-name look than the display headings. */
+  font-family: var(--font-body);
   font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--text-1);
   white-space: nowrap;
   overflow: hidden;

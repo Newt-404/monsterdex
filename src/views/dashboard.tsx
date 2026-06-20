@@ -99,7 +99,7 @@ export function Dashboard() {
           <div class="byline-head">
             <span>Line</span>
             <span class="byline-tried">Tried</span>
-            <span class="byline-avg">Avg Rating</span>
+            <span class="byline-avg">Avg</span>
           </div>
           <div class="byline-rows">
             {s.lines.map((l) => (
@@ -110,7 +110,7 @@ export function Dashboard() {
                   ) : (
                     <Claw fill="var(--accent)" size={18} class="byline-claw" />
                   )}
-                  <span class="byline-line display">{l.line === OTHER_LINE ? 'Custom' : l.line}</span>
+                  <span class="byline-line">{l.line === OTHER_LINE ? 'Custom' : l.line}</span>
                 </span>
                 <span class="byline-tried">
                   <span class="bt-num">{l.tried}</span>
