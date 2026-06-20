@@ -5,7 +5,7 @@ so future work and cold reviews don't re-litigate them. **Read this before flagg
 "missing" / "off" UI as a bug** — many dashboard/catalog/By-Line details are
 deliberate and tracked here.
 
-Last updated: 2026-06-20 (after M4 — achievements engine + post-review cleanup).
+Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 
 ---
 
@@ -48,6 +48,42 @@ Last updated: 2026-06-20 (after M4 — achievements engine + post-review cleanup
   can-count badges read `totalCans` even if the counter UI is hidden (the data still
   exists, per the M3 `count=1`-seed decision). Counter has no Settings UI until M5,
   so this is moot in practice now; revisit if M5 surfaces a reason to gate them.
+
+---
+
+## M5 — Backup/restore + offline PWA (settled choices — do NOT re-flag)
+
+- **PWA icons = the master JPEG referenced directly, no generation step (yet).**
+  `public/icons/app-icon.jpg` is a byte-copy of `mockups/mockup-app-icon.png` (which is
+  actually JPEG bytes — a clean 1254×1254 square: black squircle + green claw). The
+  manifest references it for both `any` + `maskable`, and `index.html` uses it as the
+  iOS `apple-touch-icon`. **The optimized multi-size PNG set (192/512/maskable-padded/
+  apple-touch) that asset-manifest §1 marks `BUILD-TIME` is deferred** — generating it
+  needs an image-resize tool (sharp / `@vite-pwa/assets-generator`), a new dependency,
+  and CLAUDE.md says flag deps first. The direct JPEG gives a correct home-screen install
+  now (iOS accepts JPEG apple-touch-icons); the PNG pipeline is an M6 / device-test polish
+  item. **Surfaced, not silently skipped.**
+- **`apple-touch-icon` href is hard-coded to the `/monsterdex/` base** in `index.html`
+  (Safari ignores the web manifest for the home-screen icon, and Vite doesn't rewrite
+  arbitrary `<link>` hrefs). It must track `base` in `vite.config.ts` — both carry a
+  comment saying so. Re-confirm when the repo name is finalized pre-deploy.
+- **Cancelling the iOS share sheet on export is a silent no-op** — `backupCount` /
+  `lastBackupAt` / the change-nudge are bumped only after a *successful* share (or the
+  `<a download>` fallback). So Better Safe / Hoarder light on a real saved backup, never
+  on a dismissed share sheet.
+- **Cancelling the auto-undo export aborts the whole import** ("Import cancelled — your
+  data is unchanged"). The one-tap-undo (architecture §7 step 4) is treated as mandatory:
+  if the user dismisses its share sheet, nothing is overwritten.
+- **Reset data keeps `firstLaunchDate` + `birthdaySeen`** (clears ratings/reviews/counts/
+  customs/photos/unlock-log + backup meta). Wiping the lifecycle keys would replay the M6
+  birthday overlay on next boot; reset is about the *collection*, not first-launch state.
+  Reset re-evaluates silently (suppressed), so emptying the dex throws no confetti.
+- **Confirm/validation dialogs use native `window.confirm` / `alert`** (Settings sheet).
+  Adequate for a single-user gift app; a styled in-app dialog is not built. The *validation*
+  itself is full and specific (architecture §7 steps 1–2) — only the chrome is native.
+- **Backup payload `meta.backupCount` / `lastBackupAt` embed the POST-backup values**
+  (the new count + timestamp this export creates), so a round-trip restore preserves the
+  true count. The undo export embeds current (pre-overwrite) meta verbatim.
 
 ---
 

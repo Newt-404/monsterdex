@@ -1,4 +1,4 @@
-import { signal, computed } from '@preact/signals';
+import { signal, computed, batch } from '@preact/signals';
 import {
   EMPTY_STATE,
   isTried,
@@ -87,9 +87,17 @@ export const counterEnabled = signal<boolean>(true);
 export const unlockLog = signal<Record<string, UnlockEntry>>({});
 /** Backups taken (kv meta). Feeds Better Safe / Hoarder; incremented by M5 backup. */
 export const backupCount = signal<number>(0);
+/** ISO timestamp of the last successful backup (kv meta), or null if never. */
+export const lastBackupAt = signal<string | null>(null);
+/** Mutations since the last backup (kv meta) — drives the §5.10 "N changes since
+ *  your last backup" nudge. Bumped by every write-through mutation; reset on export. */
+export const changesSinceBackup = signal<number>(0);
 /** First-launch timestamp (kv meta, architecture §8). Feeds The Origin; set by the
  *  M6 first-launch flow — null (and so The Origin stays locked) until then. */
 export const firstLaunchDate = signal<string | null>(null);
+/** Whether the birthday overlay has been dismissed (kv meta, architecture §8). Set
+ *  by the M6 first-launch flow; carried in backups so a restore never replays it. */
+export const birthdaySeen = signal<boolean>(false);
 
 /** Current user record for a slug (the cold-start zero state if untouched). */
 export function stateOf(slug: string): FlavorState {
@@ -139,25 +147,69 @@ export async function boot(): Promise<void> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/catalog.json`);
   catalog.value = (await res.json()) as Flavor[];
 
-  const [states, cs, counter, log, backups, firstLaunch] = await Promise.all([
-    getAllFlavorStates(),
-    getAllCustoms(),
-    getKv('counterEnabled', true),
-    getAllUnlockLog(),
-    getKv<number>('backupCount', 0),
-    getKv<string | null>('firstLaunchDate', null),
-  ]);
-  flavorStates.value = states;
-  customs.value = cs;
-  counterEnabled.value = counter;
-  unlockLog.value = log;
-  backupCount.value = backups;
-  firstLaunchDate.value = firstLaunch;
+  await hydrateUserState();
 
   // Stamp the schema version on first boot (drives M5 migration); harmless if set.
   void putKv('schemaVersion', SCHEMA_VERSION);
   // The badge engine is started by the app shell once this hydrate resolves
   // (its first pass back-fills lit state silently — architecture §3/§4).
+}
+
+/** Read every user store + meta key from IndexedDB into the signals in one batch.
+ *  Used by {@link boot} and, after a restore, by the M5 import path (which wraps this
+ *  in celebration-suppression so the re-evaluation stays silent — architecture §7). */
+export async function hydrateUserState(): Promise<void> {
+  const [states, cs, counter, log, backups, lastBackup, changes, firstLaunch, bday] =
+    await Promise.all([
+      getAllFlavorStates(),
+      getAllCustoms(),
+      getKv('counterEnabled', true),
+      getAllUnlockLog(),
+      getKv<number>('backupCount', 0),
+      getKv<string | null>('lastBackupAt', null),
+      getKv<number>('changesSinceBackup', 0),
+      getKv<string | null>('firstLaunchDate', null),
+      getKv<boolean>('birthdaySeen', false),
+    ]);
+  batch(() => {
+    flavorStates.value = states;
+    customs.value = cs;
+    counterEnabled.value = counter;
+    unlockLog.value = log;
+    backupCount.value = backups;
+    lastBackupAt.value = lastBackup;
+    changesSinceBackup.value = changes;
+    firstLaunchDate.value = firstLaunch;
+    birthdaySeen.value = bday;
+  });
+}
+
+// ── Changes-since-backup nudge (PRD §5.10) ────────────────────────────────────
+/** Count one user-data change toward the backup nudge. Called by every write-through
+ *  mutation below; reset to 0 on a successful export. Hydrate + import set the signal
+ *  directly (they don't go through these mutators), so a restore never inflates it. */
+function bumpChanges(): void {
+  const next = changesSinceBackup.value + 1;
+  changesSinceBackup.value = next;
+  void putKv('changesSinceBackup', next);
+}
+
+// ── Settings (PRD §5.4 counter toggle; §5.10 settings sheet) ──────────────────
+/** Whether the Settings sheet is open (gear → Settings, PRD §5.9). */
+export const settingsOpen = signal<boolean>(false);
+export function openSettings(): void {
+  settingsOpen.value = true;
+}
+export function closeSettings(): void {
+  settingsOpen.value = false;
+}
+
+/** Flip the counter feature (PRD §5.4). Hides/derives count stats + the +1 control;
+ *  never deletes counts. A settings change still counts toward the backup nudge. */
+export function setCounterEnabled(on: boolean): void {
+  counterEnabled.value = on;
+  void putKv('counterEnabled', on);
+  bumpChanges();
 }
 
 // ── Write-through mutations ───────────────────────────────────────────────────
@@ -170,6 +222,7 @@ function patch(slug: string, partial: Partial<FlavorState>): FlavorState {
   const next = { ...(flavorStates.value[slug] ?? EMPTY_STATE), ...partial };
   flavorStates.value = { ...flavorStates.value, [slug]: next };
   void putFlavorState(slug, next);
+  bumpChanges();
   return next;
 }
 
@@ -207,7 +260,7 @@ export function toggleWishlist(slug: string): void {
 export async function setPhoto(slug: string, file: File): Promise<void> {
   const blob = await compressImage(file);
   await putPhoto(slug, blob);
-  patch(slug, { hasPhoto: true });
+  patch(slug, { hasPhoto: true }); // patch() already counts the change
 }
 
 export async function removePhoto(slug: string): Promise<void> {
@@ -223,6 +276,7 @@ export function addCustom(input: CustomInput): Custom {
   const custom: Custom = { slug: `custom-${crypto.randomUUID()}`, ...input };
   customs.value = [...customs.value, custom];
   void putCustom(custom);
+  bumpChanges();
   return custom;
 }
 
@@ -230,6 +284,7 @@ export function editCustom(slug: string, input: CustomInput): void {
   const updated: Custom = { slug, ...input };
   customs.value = customs.value.map((c) => (c.slug === slug ? updated : c));
   void putCustom(updated);
+  bumpChanges();
 }
 
 /** Delete a custom: drop its definition, user record, and photo (PRD §5.5). */
@@ -241,6 +296,7 @@ export function deleteCustom(slug: string): void {
     flavorStates.value = next;
   }
   void deleteCustomRecord(slug);
+  bumpChanges();
 }
 
 // ── Custom add/edit editor overlay state ─────────────────────────────────────

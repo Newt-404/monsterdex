@@ -134,6 +134,51 @@ export async function putUnlockEntry(badgeId: string, entry: UnlockEntry): Promi
   await d.put('unlockLog', entry, badgeId);
 }
 
+// ── Bulk replace / reset (M5 backup-restore + reset data — architecture §7) ──
+
+/** The four user-data stores, cleared together on import/reset (kv meta is handled
+ *  separately by the caller — it is settings, not collection data). */
+const USER_STORES = ['flavorState', 'photos', 'customs', 'unlockLog'] as const;
+
+/** Destructively replace every user-data store in one transaction (architecture §7
+ *  step 5). Clears the four stores, then writes the supplied records **unfiltered** —
+ *  records whose slug isn't in the current catalog are kept, not dropped (orphan
+ *  preservation, PRD §5.10). Photos arrive already re-split into blobs (the caller
+ *  decodes base64 → Blob and strips the photo field off `flavorState`). */
+export async function replaceAllData(data: {
+  flavorState: Record<string, FlavorState>;
+  photos: Record<string, Blob>;
+  customs: Custom[];
+  unlockLog: Record<string, UnlockEntry>;
+}): Promise<void> {
+  const d = await db();
+  const tx = d.transaction(USER_STORES, 'readwrite');
+  // Issue every clear + put synchronously (no intervening await), or the transaction
+  // can auto-commit between operations and throw TransactionInactiveError.
+  const fs = tx.objectStore('flavorState');
+  const ph = tx.objectStore('photos');
+  const cu = tx.objectStore('customs');
+  const ul = tx.objectStore('unlockLog');
+  fs.clear();
+  ph.clear();
+  cu.clear();
+  ul.clear();
+  for (const [slug, st] of Object.entries(data.flavorState)) fs.put(st, slug);
+  for (const [slug, blob] of Object.entries(data.photos)) ph.put(blob, slug);
+  for (const c of data.customs) cu.put(c, c.slug);
+  for (const [id, entry] of Object.entries(data.unlockLog)) ul.put(entry, id);
+  await tx.done;
+}
+
+/** Wipe every user-data store (Reset data, PRD §5.10). kv meta is reset by the
+ *  caller; the app lifecycle keys (firstLaunchDate / birthdaySeen) are intentionally
+ *  preserved so the birthday overlay never replays on a reset. */
+export async function resetUserData(): Promise<void> {
+  const d = await db();
+  const tx = d.transaction(USER_STORES, 'readwrite');
+  await Promise.all([...USER_STORES.map((s) => tx.objectStore(s).clear()), tx.done]);
+}
+
 // ── kv (settings + meta) ─────────────────────────────────────────────────────
 
 export async function getKv<T>(key: string, fallback: T): Promise<T> {

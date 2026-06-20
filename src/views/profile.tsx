@@ -1,10 +1,9 @@
 // Profile tab (PRD §5.9, mockup-profile.png) — header + 2–3 headline stats (M3) plus
-// the M4 achievements grid (the 79 §5.11 badges). The gear→Settings wiring lands in
-// M5; the gear is shown for header parity but is intentionally inert.
+// the M4 achievements grid (the 79 §5.11 badges). The gear opens Settings (M5).
 // The Cans-Logged headline hides when counting is off (PRD §5.4), leaving 2 stats.
 
 import { dashboardStats, fmtAvg } from '../store/stats';
-import { counterEnabled } from '../store/state';
+import { counterEnabled, openSettings } from '../store/state';
 import { badgeTotal, badgeViews, unlockedCount } from '../badges/engine';
 import { BadgeTile } from '../ui/badge-tile';
 import { StarGlyph } from '../ui/stars';
@@ -22,8 +21,7 @@ export function Profile() {
           <br />
           MonsterDex
         </h1>
-        {/* Settings opens here in M5 (PRD §5.9/§5.10); inert until then. */}
-        <button class="profile-gear" aria-label="Settings" disabled>
+        <button class="profile-gear" aria-label="Settings" onClick={openSettings}>
           <GearIcon />
         </button>
       </header>
