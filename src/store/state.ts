@@ -12,12 +12,14 @@ import {
   deletePhoto,
   getAllCustoms,
   getAllFlavorStates,
+  getAllUnlockLog,
   getKv,
   putCustom,
   putFlavorState,
   putKv,
   putPhoto,
   SCHEMA_VERSION,
+  type UnlockEntry,
 } from './db';
 import { compressImage } from './photo';
 
@@ -78,6 +80,17 @@ export const customs = signal<Custom[]>([]);
 /** Counter feature toggle (PRD §5.4). No Settings UI until later; default on. */
 export const counterEnabled = signal<boolean>(true);
 
+// ── Badge-engine inputs (architecture §4) ─────────────────────────────────────
+/** Unlock log: badgeId → first-earned entry. Source of truth for celebrate-once
+ *  and for the lit state of permanent badges (architecture §4). Hydrated on boot;
+ *  the engine writes through on first-earn. */
+export const unlockLog = signal<Record<string, UnlockEntry>>({});
+/** Backups taken (kv meta). Feeds Better Safe / Hoarder; incremented by M5 backup. */
+export const backupCount = signal<number>(0);
+/** First-launch timestamp (kv meta, architecture §8). Feeds The Origin; set by the
+ *  M6 first-launch flow — null (and so The Origin stays locked) until then. */
+export const firstLaunchDate = signal<string | null>(null);
+
 /** Current user record for a slug (the cold-start zero state if untouched). */
 export function stateOf(slug: string): FlavorState {
   return flavorStates.value[slug] ?? EMPTY_STATE;
@@ -126,23 +139,32 @@ export async function boot(): Promise<void> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/catalog.json`);
   catalog.value = (await res.json()) as Flavor[];
 
-  const [states, cs, counter] = await Promise.all([
+  const [states, cs, counter, log, backups, firstLaunch] = await Promise.all([
     getAllFlavorStates(),
     getAllCustoms(),
     getKv('counterEnabled', true),
+    getAllUnlockLog(),
+    getKv<number>('backupCount', 0),
+    getKv<string | null>('firstLaunchDate', null),
   ]);
   flavorStates.value = states;
   customs.value = cs;
   counterEnabled.value = counter;
+  unlockLog.value = log;
+  backupCount.value = backups;
+  firstLaunchDate.value = firstLaunch;
 
   // Stamp the schema version on first boot (drives M5 migration); harmless if set.
   void putKv('schemaVersion', SCHEMA_VERSION);
-  // M4: run the badge engine here once, silently, to set initial lit state.
+  // The badge engine is started by the app shell once this hydrate resolves
+  // (its first pass back-fills lit state silently — architecture §3/§4).
 }
 
 // ── Write-through mutations ───────────────────────────────────────────────────
 // Each updates the in-memory signal optimistically (UI reacts instantly) and
-// persists async. M4 will additionally re-run the badge engine after each.
+// persists async. The badge engine re-evaluates on its own: it is a signals
+// `effect` over the derived snapshot (badges/engine.ts), so any state change here
+// re-runs it for free — no per-mutation wiring needed.
 
 function patch(slug: string, partial: Partial<FlavorState>): FlavorState {
   const next = { ...(flavorStates.value[slug] ?? EMPTY_STATE), ...partial };

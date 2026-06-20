@@ -4,6 +4,7 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 import { activeTab, boot, customEditor, detailSlug } from './store/state';
+import { startBadgeEngine } from './badges/engine';
 import { TabBar } from './ui/tab-bar';
 import { CanDefs } from './can/can-defs';
 import { Catalog } from './views/catalog';
@@ -11,11 +12,14 @@ import { Dashboard } from './views/dashboard';
 import { Profile } from './views/profile';
 import { FlavorDetail } from './views/flavor-detail';
 import { CustomForm } from './views/custom-form';
+import { BadgeUnlock } from './ui/badge-unlock';
 import './styles/app.css';
 
 export function App() {
   useEffect(() => {
-    void boot();
+    // Start the badge engine only once the hydrate resolves, so its first (silent)
+    // pass back-fills lit state from the restored stores (architecture §3/§4).
+    void boot().then(startBadgeEngine);
   }, []);
 
   const tab = activeTab.value;
@@ -55,6 +59,7 @@ export function App() {
       </main>
       <TabBar />
       {customEditor.value ? <CustomForm /> : null}
+      <BadgeUnlock />
     </div>
   );
 }

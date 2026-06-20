@@ -5,7 +5,49 @@ so future work and cold reviews don't re-litigate them. **Read this before flagg
 "missing" / "off" UI as a bug** — many dashboard/catalog/By-Line details are
 deliberate and tracked here.
 
-Last updated: 2026-06-20 (after the M3 cold review).
+Last updated: 2026-06-20 (after M4 — achievements engine + post-review cleanup).
+
+---
+
+## M4 — Achievements engine (settled choices — do NOT re-flag)
+
+- **Alcoholic badges are NOT secret** (deliberate PRD override, Newt's call). The 9
+  alcoholic badges (5 "flavors tried" + 4 "cans logged") are marked `secret: true`
+  in PRD §5.11, but are shown openly in the grid (`secret: false` in `defs.ts`) so
+  the alcoholic ladders are visible rather than hidden behind "???". Latch types are
+  unchanged. This drops the total secret count from 27 → **18**. The other 18
+  funny/secret badges remain hidden as designed.
+
+- **Latch types follow the §5.11 table verbatim.** The build-plan "Watch (UX)"
+  note groups So Close / NPC Behavior / Fence Sitter / "No one liked you…" with the
+  un-lighting *dynamic* descriptors, but that same note explicitly says the latch
+  *type* is decided in the §5.11 table — and the table marks all four `perm`. So
+  they **latch** (stay lit after earning, e.g. So Close does NOT vanish on dex
+  completion). Only **Promises Kept** and **Anti AI-Slop** in that list are `dyn`.
+- **Three badges are wired but dormant** (same pattern as the render tier): **The
+  Origin** (needs `firstLaunchDate`, owned by the M6 first-launch flow,
+  architecture §8), **Better Safe** / **Hoarder** (need `backupCount`, owned by M5
+  backup). Their predicates read snapshot fields that nothing increments in M4, so
+  they sit locked/secret until their owning milestone lights them. Not a bug.
+- **Glyphs are the ~21 base set only** (asset-manifest §5). Per-tier indicators
+  (`+ tier`, `crowned`, `loop`, `"3"`, `all-lines`, per-line claw tint) from the
+  PRD `Glyph` column are **not** drawn yet — every badge shows its base glyph.
+  Tier/crown/tint differentiation is M6 visual polish.
+- **Grid order is PRD §5.11 table order** (groups in sequence; secrets last), not
+  the mockup's "unlocked-first" arrangement — stable positions are less jarring as
+  badges unlock. The mockup tile *styling* is matched; only the ordering differs.
+- **Locked-tile progress is integer count ladders only** (e.g. "19 / 25"). Avg- and
+  boolean-gated badges (Connoisseur, Final Verdict-style, completion) show their
+  requirement text without a `current / target` line — the mockup's "4.3 / 4.5" on
+  Connoisseur (a fractional-avg progress) is deferred.
+- **Promises Kept semantics:** satisfied when `wishlistedCount ≥ 5` AND
+  `wishlistOpenCount === 0` (≥5 flavors flagged wishlist, none still untried).
+  Resolves the architecture §4 `wishlistOpen/Satisfied` fields; reachable via the
+  +1 ("Had it") path since rating auto-clears the wishlist flag.
+- **Badges evaluate on raw logged data regardless of the counter toggle.** The
+  can-count badges read `totalCans` even if the counter UI is hidden (the data still
+  exists, per the M3 `count=1`-seed decision). Counter has no Settings UI until M5,
+  so this is moot in practice now; revisit if M5 surfaces a reason to gate them.
 
 ---
 
@@ -16,9 +58,17 @@ Last updated: 2026-06-20 (after the M3 cold review).
   The mockup tints each claw its line's color. Deferred until the per-flavor /
   per-line accent colors are confirmed against real can art (M6 hex tuning). Do
   **not** tint per line until those colors are locked.
+- **Badge glyph visual refinement** (M4 → M6) — the ~21 base glyphs in `glyphs.tsx`
+  are functional but rough in places (the **infinity** glyph path especially); the
+  per-tier indicators / crowned / loop / per-line claw tint are also unbuilt (see
+  the M4 section). Refine glyph shapes + add tier differentiation in the M6 polish
+  pass, at real size with the bundled font.
 - **Off-token hardcoded px** in `dashboard.css` (the By-Line box especially: gaps,
-  font-sizes 9–12px, column widths, the `60px` / `40px` big-stat sizes). To be
-  reconciled into `design-tokens.md` during the M6 finalize pass.
+  font-sizes 9–12px, column widths, the `60px` / `40px` big-stat sizes) **and in
+  `profile.css` / `badge-unlock.css`** (achievements grid + unlock popup: type sizes
+  `11–34px`, tile `min-height:138px`, art `52px`, check chip `22px`). To be
+  reconciled into a real type-scale in `design-tokens.md` during the M6 finalize
+  pass. (`--accent-rgb` was tokenised in M4; type sizes are the remaining gap.)
 - **Fragile `margin-right:-6px` nudge** on `.byline-tried` (pulls TRIED toward
   AVG) — depends on exact column widths; fine now, revisit with a sturdier
   approach if digit counts / fonts change.
@@ -60,7 +110,14 @@ Last updated: 2026-06-20 (after the M3 cold review).
 ---
 
 ## Pending a decision (not yet resolved)
-_None currently._
+- **Connoisseur (and other avg-gated) locked-tile progress → decide in M6.** M4
+  shows a `current / target` progress line only on integer-count ladders; avg- and
+  boolean-gated badges show their requirement text with no progress number. But
+  `mockup-profile.png` explicitly renders **"4.3 / 4.5"** under a locked Connoisseur
+  tile (a fractional running-average progress). Decide in M6 whether to restore
+  fractional-avg progress (Connoisseur, Impossible to Please) to match the mockup,
+  or keep the integer-ladder-only rule and accept the divergence. Flagged by the M4
+  cold review so it isn't silently dropped.
 
 ---
 
@@ -68,3 +125,14 @@ _None currently._
 - Reconcile every dashboard number against Bassie's real IndexedDB data.
 - By-Line layout holds at 360px (iPhone SE) — no AVG-column clipping.
 - The `count = 1` seed produces a Cans Logged number that reads correctly on device.
+
+### M4 — achievements (engine behavior is unit-verified; visuals/feel are not)
+- **"Watch (UX)" felt-behavior:** confirm the latching `perm` near-miss trophies
+  (So Close, NPC Behavior, Fence Sitter, "No one liked you…") *feel* right when they
+  latch on the action that surpasses them — rule-correct per the §5.11 table, but a
+  subjective call (build-plan M4 note).
+- **Lit-tile appearance + confetti** — accent border / glow / colored glyph / check
+  chip and the unlock-popup confetti are verified only from code + mockup, never on a
+  real canvas. Watch one badge actually light + celebrate on device.
+- **Badge grid at 360px (iPhone SE)** — the 3-up grid + tile text fit without
+  clipping column 3 or overflowing on the narrowest screen.

@@ -23,6 +23,7 @@ Where the mockups disagree with each other, the canonical choice is noted in
 
   /* Accent (UI green — distinct from per-flavor can color) */
   --accent:       #7CFC00; /* PINNED — stars, active states, progress, unlocks */
+  --accent-rgb:   124, 252, 0; /* PINNED — same green as r,g,b triplet, for rgba() alpha use */
   --accent-press: #6FE000; /* EST  — pressed/active darker step */
   --on-accent:    #0B0B0C; /* PINNED — text/icons sitting ON a green fill */
 
@@ -103,9 +104,9 @@ not drop shadows. Green glow appears **only** on active/interactive elements
 
 ```css
 :root {
-  --shadow-can:   0 6px 18px rgba(0,0,0,0.5);          /* under SVG cans */
-  --glow-active:  0 0 16px rgba(124,252,0,0.35);       /* buttons, active tab, unlocked tiles */
-  --glow-strong:  0 0 28px rgba(124,252,0,0.55);       /* unlock celebration medal */
+  --shadow-can:   0 6px 18px rgba(0,0,0,0.5);                 /* under SVG cans */
+  --glow-active:  0 0 16px rgba(var(--accent-rgb),0.35);      /* buttons, active tab, unlocked tiles */
+  --glow-strong:  0 0 28px rgba(var(--accent-rgb),0.55);      /* unlock celebration medal */
 }
 ```
 

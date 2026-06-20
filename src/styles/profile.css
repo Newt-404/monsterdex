@@ -68,3 +68,122 @@
   text-transform: uppercase;
   color: var(--text-3);
 }
+
+/* ── Achievements (M4, PRD §5.11 / mockup-profile.png) ───────────────────── */
+.achievements {
+  margin: var(--space-6) 0 var(--space-4);
+}
+.ach-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.ach-title {
+  font-size: 22px;
+  color: var(--text-1);
+}
+.ach-count {
+  margin-left: auto;
+  color: var(--text-3);
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+/* Tile — three states share one frame; modifiers recolor (tokens §5). */
+.badge-tile {
+  position: relative;
+  min-width: 0;
+  min-height: 138px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-tile);
+}
+.badge-tile.lit {
+  border-color: var(--accent);
+  box-shadow: var(--glow-active);
+}
+
+/* Corner lock — present on every non-lit tile (locked + secret). */
+.badge-lock {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  line-height: 0;
+  color: var(--locked);
+}
+
+/* Icon area — glyph inherits this color via currentColor (recolor by state). */
+.badge-art {
+  position: relative;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-1);
+  color: var(--locked);
+}
+.badge-tile.lit .badge-art {
+  color: var(--accent);
+}
+.badge-glyph {
+  position: relative;
+  z-index: 1;
+}
+/* Soft green burst behind an unlocked glyph (ray detail is M6 polish). */
+.badge-burst {
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.3) 0%, rgba(var(--accent-rgb), 0) 66%);
+}
+.badge-qmark {
+  font-size: 26px;
+  color: var(--locked);
+  letter-spacing: 0.04em;
+}
+
+.badge-title {
+  font-size: 13px;
+  line-height: 1.05;
+  color: var(--text-2);
+}
+.badge-tile.lit .badge-title {
+  color: var(--text-1);
+}
+.badge-req {
+  /* 11px matches .badge-progress + the profile stat-sub; removes the lone fractional
+     size. The full type scale gets real tokens in the M6 design-tokens finalize. */
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--text-3);
+}
+.badge-progress {
+  margin-top: auto;
+  padding-top: var(--space-1);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* Green check chip on unlocked tiles (mockup). */
+.badge-check {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--glow-active);
+}

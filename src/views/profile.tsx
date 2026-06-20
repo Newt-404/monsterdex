@@ -1,10 +1,12 @@
-// Profile tab (PRD §5.9, mockup-profile.png) — M3 builds the header + the 2–3
-// headline stats only. The achievements grid + gear→Settings wiring land in
-// M4 / M5; the gear is shown here for header parity but is intentionally inert.
+// Profile tab (PRD §5.9, mockup-profile.png) — header + 2–3 headline stats (M3) plus
+// the M4 achievements grid (the 79 §5.11 badges). The gear→Settings wiring lands in
+// M5; the gear is shown for header parity but is intentionally inert.
 // The Cans-Logged headline hides when counting is off (PRD §5.4), leaving 2 stats.
 
 import { dashboardStats, fmtAvg } from '../store/stats';
 import { counterEnabled } from '../store/state';
+import { badgeTotal, badgeViews, unlockedCount } from '../badges/engine';
+import { BadgeTile } from '../ui/badge-tile';
 import { StarGlyph } from '../ui/stars';
 import '../styles/profile.css';
 
@@ -49,8 +51,31 @@ export function Profile() {
         </div>
       </section>
 
-      {/* Achievements grid lands in M4 (build plan: "header + headline stats, minus the grid"). */}
+      <section class="achievements">
+        <header class="ach-head">
+          <TrophyIcon />
+          <h2 class="ach-title display">Achievements</h2>
+          <span class="ach-count caption">
+            {unlockedCount.value} / {badgeTotal} Unlocked
+          </span>
+        </header>
+        <div class="badge-grid">
+          {badgeViews.value.map((v) => (
+            <BadgeTile key={v.def.id} view={v} />
+          ))}
+        </div>
+      </section>
     </div>
+  );
+}
+
+function TrophyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M7 4h10v5a5 5 0 0 1-10 0V4z" />
+      <path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3" />
+      <path d="M12 14v3M9 20h6M10 20l.5-3h3l.5 3" />
+    </svg>
   );
 }
 

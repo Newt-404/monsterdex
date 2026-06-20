@@ -111,6 +111,29 @@ export async function deleteCustomRecord(slug: string): Promise<void> {
   ]);
 }
 
+// ── unlockLog (badge engine — architecture §4 / §5.10) ───────────────────────
+
+/** Hydrate the full unlock log (badgeId → first-earned entry). Zips keys (badgeId)
+ *  with values, as the value does not embed its own id. */
+export async function getAllUnlockLog(): Promise<Record<string, UnlockEntry>> {
+  const d = await db();
+  const [keys, values] = await Promise.all([
+    d.getAllKeys('unlockLog'),
+    d.getAll('unlockLog'),
+  ]);
+  const out: Record<string, UnlockEntry> = {};
+  keys.forEach((k, i) => {
+    out[k as string] = values[i];
+  });
+  return out;
+}
+
+/** Append/overwrite a single unlock entry (write-through on first-earn). */
+export async function putUnlockEntry(badgeId: string, entry: UnlockEntry): Promise<void> {
+  const d = await db();
+  await d.put('unlockLog', entry, badgeId);
+}
+
 // ── kv (settings + meta) ─────────────────────────────────────────────────────
 
 export async function getKv<T>(key: string, fallback: T): Promise<T> {

@@ -1,0 +1,99 @@
+/* Badge-unlock celebration popup (mockup-badge-unlock.png). Values from design-tokens.md;
+   confetti is drawn by canvas-confetti on its own fixed canvas. */
+
+.unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.unlock-card {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+}
+
+.unlock-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.unlock-medal {
+  line-height: 0;
+  margin-bottom: var(--space-4);
+  filter: drop-shadow(var(--glow-strong));
+}
+
+.unlock-head {
+  font-size: 34px;
+  line-height: 0.95;
+  color: var(--text-1);
+}
+
+.unlock-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 70%;
+  margin: var(--space-4) 0 var(--space-3);
+  line-height: 0;
+}
+.unlock-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to var(--_d, right), transparent, rgba(var(--accent-rgb), 0.5));
+}
+.unlock-rule:last-child {
+  --_d: left;
+}
+
+.unlock-title {
+  font-size: 21px;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.unlock-req {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.unlock-cta {
+  margin-top: var(--space-5);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--r-button);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: var(--glow-active);
+}
+.unlock-cta:active {
+  background: var(--accent-press);
+}
