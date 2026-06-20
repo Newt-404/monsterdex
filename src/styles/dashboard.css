@@ -50,7 +50,10 @@
    gets cramped. The shrink itself is enabled by `min-width:0` on `.panel`. */
 .dash-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Right column a touch wider than the left — the content-dense panels
+     (distribution, by-line, most-drunk) sit on the right and want more room.
+     The distribution bars fill their box (flex:1), so they widen along with it. */
+  grid-template-columns: 1fr 1.2fr;
   gap: var(--space-3);
   margin-top: var(--space-3);
 }
