@@ -74,8 +74,18 @@ function blobToDataURL(blob: Blob): Promise<string> {
   });
 }
 
-async function dataURLToBlob(dataUrl: string): Promise<Blob> {
-  return (await fetch(dataUrl)).blob(); // browsers resolve data: URLs locally — no network
+/** Decode a `data:<mime>;base64,<payload>` URL to a Blob using `atob` — no `fetch`, so
+ *  it honours CLAUDE.md's "no network at runtime" rule and survives a strict CSP
+ *  `connect-src`. Throws on a malformed URL / bad base64 (the caller drops just that photo). */
+function dataURLToBlob(dataUrl: string): Blob {
+  const comma = dataUrl.indexOf(',');
+  if (!dataUrl.startsWith('data:') || comma === -1) throw new Error('not a data URL');
+  const header = dataUrl.slice(5, comma); // between "data:" and ","
+  const mime = header.split(';')[0] || 'application/octet-stream';
+  const bin = atob(dataUrl.slice(comma + 1));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
 }
 
 // ── Export ────────────────────────────────────────────────────────────────────
@@ -121,9 +131,9 @@ async function buildPayload(metaOverride?: Partial<BackupMeta>): Promise<BackupP
   };
 }
 
-function payloadToFile(payload: BackupPayload, dateStamp: string): File {
+function payloadToFile(payload: BackupPayload, filename: string): File {
   const json = JSON.stringify(payload, null, 2);
-  return new File([json], `monsterdex-backup-${dateStamp}.json`, { type: 'application/json' });
+  return new File([json], filename, { type: 'application/json' });
 }
 
 /** Deliver a file via the iOS share sheet, falling back to an `<a download>` (PRD
@@ -166,7 +176,7 @@ export async function exportBackup(): Promise<boolean> {
   });
 
   try {
-    await deliverFile(payloadToFile(payload, stamp));
+    await deliverFile(payloadToFile(payload, `monsterdex-backup-${stamp}.json`));
   } catch (err) {
     if (isAbort(err)) return false; // user dismissed the share sheet
     throw err;
@@ -180,9 +190,12 @@ export async function exportBackup(): Promise<boolean> {
     putKv('lastBackupAt', now),
     putKv('changesSinceBackup', 0),
   ]);
+  // The `backupCount` write re-runs the badge engine with the new count visible, so
+  // Better Safe / Hoarder celebrate here (not suppressed — a genuine earn). Order isn't
+  // load-bearing: any of these writes re-evaluates, and the final state carries newCount.
   lastBackupAt.value = now;
   changesSinceBackup.value = 0;
-  backupCount.value = newCount; // last: drives the badge re-evaluation
+  backupCount.value = newCount;
   return true;
 }
 
@@ -280,7 +293,7 @@ export async function importBackup(payload: BackupPayload): Promise<void> {
   // Step 4: auto-export current data as the one-tap undo, BEFORE we overwrite anything.
   const undo = await buildPayload();
   try {
-    await deliverFile(payloadToFile(undo, `before-restore-${nowISO().slice(0, 10)}`));
+    await deliverFile(payloadToFile(undo, `monsterdex-before-restore-${nowISO().slice(0, 10)}.json`));
   } catch (err) {
     if (isAbort(err)) throw new Error('Import cancelled — your data is unchanged.');
     throw err;
@@ -302,7 +315,7 @@ export async function importBackup(payload: BackupPayload): Promise<void> {
     };
     if (f.userPhoto) {
       try {
-        photos[f.slug] = await dataURLToBlob(f.userPhoto);
+        photos[f.slug] = dataURLToBlob(f.userPhoto);
       } catch {
         flavorState[f.slug].hasPhoto = false; // unreadable photo → keep the rest of the record
       }

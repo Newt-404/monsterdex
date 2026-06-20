@@ -28,14 +28,19 @@ export default defineConfig({
         orientation: 'portrait',
         background_color: '#0B0B0C',
         theme_color: '#0B0B0C',
+        // Only `any` — the master is a full-bleed squircle with no maskable safe-area
+        // padding, so declaring it `maskable` would let Android clip the claw inside the
+        // mask. The padded maskable PNG is deferred with the rest of the icon pipeline
+        // (asset-manifest §1 / deferred-decisions.md). iOS uses the apple-touch-icon.
         icons: [
           { src: 'icons/app-icon.jpg', sizes: '1254x1254', type: 'image/jpeg', purpose: 'any' },
-          { src: 'icons/app-icon.jpg', sizes: '1254x1254', type: 'image/jpeg', purpose: 'maskable' },
         ],
       },
       workbox: {
         // Precache the shell + catalog.json + bundled Anton font + glyphs + icons so the
         // app is fully functional offline from first launch (architecture §6, PRD §7).
+        // The icon is `.jpg` today; `png`/`ico` are kept deliberately so the deferred
+        // multi-size icon set (asset-manifest §1) precaches automatically when it lands.
         globPatterns: ['**/*.{js,css,html,json,woff2,svg,png,jpg,ico}'],
         // Dormant render tier (architecture §5/§6): a CacheFirst route for future bundled
         // /renders/*.png. No assets serve it in v1 — wired, not used.

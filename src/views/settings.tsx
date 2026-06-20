@@ -54,7 +54,8 @@ export function Settings() {
       }
       const n = result.payload.flavors.length;
       const ok = confirm(
-        `Restore this backup?\n\nThis replaces ALL current data with ${n} saved flavor record(s). ` +
+        `Restore this backup?\n\nThis replaces ALL current data — ratings, reviews, counts, ` +
+          `custom flavors, photos, and achievements — with this backup (${n} saved flavor record(s)). ` +
           `Your current data is exported first (a one-tap undo) before anything changes.`,
       );
       if (!ok) return;

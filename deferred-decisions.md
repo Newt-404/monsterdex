@@ -56,8 +56,9 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 - **PWA icons = the master JPEG referenced directly, no generation step (yet).**
   `public/icons/app-icon.jpg` is a byte-copy of `mockups/mockup-app-icon.png` (which is
   actually JPEG bytes — a clean 1254×1254 square: black squircle + green claw). The
-  manifest references it for both `any` + `maskable`, and `index.html` uses it as the
-  iOS `apple-touch-icon`. **The optimized multi-size PNG set (192/512/maskable-padded/
+  manifest references it for `any` only (no `maskable` — the unpadded full-bleed master
+  would clip on Android; the padded maskable PNG is deferred below), and `index.html`
+  uses it as the iOS `apple-touch-icon`. **The optimized multi-size PNG set (192/512/maskable-padded/
   apple-touch) that asset-manifest §1 marks `BUILD-TIME` is deferred** — generating it
   needs an image-resize tool (sharp / `@vite-pwa/assets-generator`), a new dependency,
   and CLAUDE.md says flag deps first. The direct JPEG gives a correct home-screen install
@@ -84,6 +85,11 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
 - **Backup payload `meta.backupCount` / `lastBackupAt` embed the POST-backup values**
   (the new count + timestamp this export creates), so a round-trip restore preserves the
   true count. The undo export embeds current (pre-overwrite) meta verbatim.
+- **Desktop `<a download>` fallback always counts a backup** (no cancel signal exists
+  for a download, unlike the iOS share sheet). So on desktop, `backupCount` — and thus
+  Better Safe / Hoarder — can be "farmed" by repeated downloads. **Accepted, out of
+  scope (Newt's call, 2026-06-20):** the target is a single-user iPhone PWA that always
+  takes the share-sheet path; the download fallback is a dev/desktop convenience only.
 
 ---
 
@@ -154,6 +160,16 @@ Last updated: 2026-06-20 (after M5 — backup/restore + offline PWA).
   fractional-avg progress (Connoisseur, Impossible to Please) to match the mockup,
   or keep the integer-ladder-only rule and accept the divergence. Flagged by the M4
   cold review so it isn't silently dropped.
+- **Import: merge vs. overwrite the lifecycle keys (`firstLaunchDate` /
+  `birthdaySeen`) → decide when M6 wires first-launch (Newt's call, deferred 2026-06-20).**
+  M5 import currently **overwrites** them with the backup's meta (architecture §7
+  step 6 restores meta as-is). Harmless today — nothing sets them in ≤M5. But once M6
+  records `firstLaunchDate` / sets `birthdaySeen=true` on a device, restoring an older
+  backup whose meta has `birthdaySeen:false` would **replay the birthday overlay**, and
+  `firstLaunchDate:null` would briefly un-satisfy The Origin (it stays *lit* — permanent
+  + restored log). Fix direction when M6 lands: merge (keep the local value if already
+  set) rather than overwrite. Flagged by the M5 cold review. *Reset already keeps these
+  keys — see the M5 settled section; this is only about the import path.*
 
 ---
 

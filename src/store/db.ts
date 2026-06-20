@@ -23,9 +23,13 @@ interface MonsterDexDB extends DBSchema {
 }
 
 const DB_NAME = 'monsterdex';
+/** IndexedDB *structure* version — bumped only when the object stores/indexes change,
+ *  to trigger the `upgrade` callback. Distinct from SCHEMA_VERSION below. */
 const DB_VERSION = 1;
 
-/** Current schema version — stamped into `kv` on first boot; drives M5 migration. */
+/** Backup *payload* schema version — stamped into `kv` on first boot and written into
+ *  every export; drives import validation + forward-migration (architecture §7). Bumped
+ *  when the backup JSON shape changes, independent of the IDB DB_VERSION above. */
 export const SCHEMA_VERSION = 1;
 
 let dbPromise: Promise<IDBPDatabase<MonsterDexDB>> | null = null;
