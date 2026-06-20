@@ -48,15 +48,19 @@ Last updated: 2026-06-20 (after the M3 cold review).
   display face — a deliberately lighter look for this table.
 - **Right dashboard column wider than left** (`grid-template-columns: 1fr 1.2fr`) —
   intentional, to give the denser right-side panels more room.
+- **`setRating` seeds `count = 1`** on a first rating (`state.ts`) — **kept**
+  (Newt's call, 2026-06-20). Rationale: you can't rate a flavor you never had, so a
+  first rating implies ≥1 can; "Cans Logged" is a best-estimate of cans drunk, not a
+  pure tally of +1 taps. **Mitigation:** when the counter is **disabled**, the
+  Cans Logged and Most Drunk cards (and the profile Cans Logged headline stat) are
+  hidden anyway, so the seeded counts never surface — the count data is preserved,
+  just not shown (PRD §5.4 hide-not-delete). Only seeds from count 0; never bumps an
+  existing tally; clearing a rating leaves the count alone.
 
 ---
 
 ## Pending a decision (not yet resolved)
-- **`setRating` seeds `count = 1`** on a first rating (`state.ts`). Consequence:
-  "Cans Logged" and "Most Drunk" include rated-but-never-+1'd flavors, so
-  Cans Logged = (+1 taps) + (rated flavors). Open question: is that the intended
-  meaning of Cans Logged, or should rating set only the `tried` flag without
-  touching the can count? — awaiting Newt's call.
+_None currently._
 
 ---
 
