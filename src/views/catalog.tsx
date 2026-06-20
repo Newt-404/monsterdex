@@ -20,8 +20,10 @@ import {
   wishlistOnly,
   type SortMode,
 } from '../store/state';
+import { useLayoutEffect, useRef } from 'preact/hooks';
 import { FlavorCard } from '../ui/flavor-card';
 import { Claw } from '../can/claw';
+import { type Flavor } from '../types';
 import '../styles/catalog.css';
 
 const SORTS: { id: SortMode; label: string }[] = [
@@ -80,6 +82,11 @@ function ByLine() {
   // An active search/filter overrides collapse (PRD §5.1): show every matching
   // line expanded; restore the user's collapse state once the filter clears.
   const overrideCollapse = filterActive.value;
+  // A signature of the current filter state. When it changes, each row snaps back
+  // to its start (below) — otherwise the browser keeps the previously-visible card
+  // anchored when filtered-out cards reappear, leaving the row scrolled past the
+  // real first flavor.
+  const filterSig = `${triedFilter.value}|${wishlistOnly.value}|${searchQuery.value.trim()}`;
   return (
     <>
       {catalogByLine.value.map(({ line, flavors }) => {
@@ -98,17 +105,28 @@ function ByLine() {
                 <ChevronIcon />
               </span>
             </button>
-            {!collapsed ? (
-              <div class="swipe-row no-scrollbar">
-                {flavors.map((f) => (
-                  <FlavorCard flavor={f} key={f.slug} />
-                ))}
-              </div>
-            ) : null}
+            {!collapsed ? <SwipeRow flavors={flavors} resetKey={filterSig} /> : null}
           </section>
         );
       })}
     </>
+  );
+}
+
+/** A horizontal line row. Resets its scroll to the start whenever `resetKey`
+ *  changes (i.e. the filter/search changes) so it always reopens on the real
+ *  first flavor rather than wherever a now-removed filter left it scrolled. */
+function SwipeRow({ flavors, resetKey }: { flavors: Flavor[]; resetKey: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.scrollLeft = 0;
+  }, [resetKey]);
+  return (
+    <div class="swipe-row no-scrollbar" ref={ref}>
+      {flavors.map((f) => (
+        <FlavorCard flavor={f} key={f.slug} />
+      ))}
+    </div>
   );
 }
 
