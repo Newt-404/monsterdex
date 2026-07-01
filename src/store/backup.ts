@@ -136,18 +136,8 @@ function payloadToFile(payload: BackupPayload, filename: string): File {
   return new File([json], filename, { type: 'application/json' });
 }
 
-/** Deliver a file via the iOS share sheet, falling back to an `<a download>` (PRD
- *  §5.10). Rejects with an `AbortError` if the user cancels the share — callers treat
- *  that as "no backup was made", not a failure. */
-async function deliverFile(file: File): Promise<void> {
-  const nav = navigator as Navigator & {
-    canShare?: (d: ShareData) => boolean;
-    share?: (d: ShareData) => Promise<void>;
-  };
-  if (nav.share && nav.canShare?.({ files: [file] })) {
-    await nav.share({ files: [file], title: file.name });
-    return;
-  }
+/** Trigger a plain `<a download>` for the file (the universal fallback path). */
+function downloadFile(file: File): void {
   const url = URL.createObjectURL(file);
   const a = document.createElement('a');
   a.href = url;
@@ -156,6 +146,35 @@ async function deliverFile(file: File): Promise<void> {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+/** Deliver a file via the share sheet (iOS + Android), falling back to an `<a download>`
+ *  (PRD §5.10). Rejects with an `AbortError` if the user cancels the share — callers treat
+ *  that as "no backup was made", not a failure.
+ *
+ *  Android caveat: `canShare({files})` reports capability, but `share()` itself can still
+ *  reject for reasons that are NOT a user cancel — most often `NotAllowedError`, because the
+ *  button tap's transient user activation is consumed by the async `buildPayload()` (photo
+ *  reads) before we get here. iOS Safari tolerates that gap; Android Chrome does not. So on
+ *  ANY non-abort share failure we fall through to the download link rather than failing the
+ *  whole export — otherwise the backup button just errors on Android. A real cancel
+ *  (AbortError) still propagates so the caller treats it as "no backup made". */
+async function deliverFile(file: File): Promise<void> {
+  const nav = navigator as Navigator & {
+    canShare?: (d: ShareData) => boolean;
+    share?: (d: ShareData) => Promise<void>;
+  };
+  if (nav.share && nav.canShare?.({ files: [file] })) {
+    try {
+      await nav.share({ files: [file], title: file.name });
+      return;
+    } catch (err) {
+      if (isAbort(err)) throw err; // genuine user cancel — let the caller no-op
+      // Otherwise the share failed technically (activation lost, no target, size, …).
+      // Fall through to the download link so the export still succeeds.
+    }
+  }
+  downloadFile(file);
 }
 
 function isAbort(err: unknown): boolean {
